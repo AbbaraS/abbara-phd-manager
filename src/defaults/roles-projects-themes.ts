@@ -25,17 +25,6 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'gta', name: 'GTA', icon: 'id-card-lanyard', color: '#32C2CC', hidden: false, statuses: starterStatuses(),
-		projects: [
-			project('comp', 'COMP'),
-			project('eeen', 'EEEN'),
-		],
-		types: [
-			type('lab', 'Lab', 'presentation'),
-			type('admin', 'Admin', 'clipboard-list'),
-		],
-	},
-	{
 		id: 'reslife', name: 'ResLife', icon: 'handshake', color: '#339933', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('schedule', 'Schedule'),
@@ -43,15 +32,6 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 		types: [
 			type('shiftswap', 'Shift swap', 'calendar-clock'),
-		],
-	},
-	{
-		id: 'jobshop', name: 'JobShop', icon: 'cake-slice', color: '#FF7F50', hidden: false, statuses: starterStatuses(),
-		projects: [
-			project('wp-website', 'WP Website'),
-		],
-		types: [
-			type('addshift', 'Add shift', 'clipboard-list'),
 		],
 	},
 	{
