@@ -183,8 +183,8 @@
 .apm-card {
 	display: flex;
 	flex-direction: column;
-	gap: var(--size-4-2);
-	padding: var(--size-4-3) var(--size-4-4);
+	gap: var(--size-4-1);
+	padding: var(--size-4-2) var(--size-4-3);
 	border: 1px solid color-mix(in srgb, var(--apm-card-color) 30%, var(--background-modifier-border));
 	border-top: 3px solid var(--apm-card-color);
 	border-radius: var(--radius-l);
@@ -202,20 +202,21 @@
 /* Project icon in a round chip. */
 .apm-card-icon {
 	display: inline-flex;
-	padding: 6px;
+	padding: 7px;
 	border-radius: 50%;
 	background: color-mix(in srgb, var(--apm-card-color) 20%, transparent);
 	color: var(--apm-card-color);
 }
 
 .apm-card-icon svg {
-	width: 16px;
-	height: 16px;
+	width: 14px;
+	height: 14px;
 }
 
 .apm-card-name {
 	font-weight: var(--font-semibold);
-	line-height: 1.2;
+	font-size: var(--font-ui-large);
+	line-height: 1;
 }
 
 .apm-card-role {
@@ -227,11 +228,11 @@
 .apm-card-count {
 	display: flex;
 	align-items: baseline;
-	gap: var(--size-4-2);
+	gap: var(--size-4-1);
 }
 
 .apm-card-days {
-	font-size: 2em;
+	font-size: 1.2em;
 	font-weight: var(--font-bold);
 	line-height: 1;
 	letter-spacing: -0.02em;
