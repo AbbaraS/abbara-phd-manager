@@ -1,0 +1,81 @@
+/* ---------- Daily note toolbar ---------- */
+
+/* Row of role buttons above the note. */
+.apm-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2) var(--size-4-4);
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+}
+
+/* One role button, tinted with the role colour. */
+.apm-role-button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	padding: var(--size-4-1) var(--size-4-3);
+	border: 1px solid var(--apm-role-color);
+	border-radius: var(--radius-m);
+	background: color-mix(in srgb, var(--apm-role-color) 15%, transparent);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+	box-shadow: none;
+}
+
+.apm-role-button:hover {
+	background: color-mix(in srgb, var(--apm-role-color) 30%, transparent);
+}
+
+/* Icon takes the role colour. */
+.apm-role-icon {
+	display: inline-flex;
+	color: var(--apm-role-color);
+}
+
+.apm-role-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+/* ---------- Settings page ---------- */
+
+/* Collapsible role block. */
+.apm-role {
+	margin: var(--size-4-2) 0;
+	padding: var(--size-4-2) var(--size-4-3);
+	border: 1px solid var(--background-modifier-border);
+	border-left: 4px solid var(--apm-role-color, var(--interactive-accent));
+	border-radius: var(--radius-m);
+}
+
+.apm-role-summary {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+}
+
+/* Small colour dot next to a project name. */
+.apm-swatch {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: var(--size-4-2);
+	border-radius: 50%;
+}
+
+/* Indent project-level types. */
+.apm-nested {
+	margin-left: var(--size-4-6);
+	padding-left: var(--size-4-3);
+	border-left: 1px dashed var(--background-modifier-border);
+}
+
+/* Keep type rows compact. */
+.apm-type-row input[type="text"] {
+	width: 9em;
+}
