@@ -41,15 +41,20 @@ function renderCard(grid: HTMLElement, row: ProgressRow): void {
 	count.createSpan({ cls: 'apm-card-days', text: value });
 	count.createSpan({ cls: 'apm-card-label', text: label });
 
+	// Due date on the same row, pushed to the right.
+	const due = moment(row.project.deadline, 'YYYY-MM-DD').format('dd D MMM YYYY');
+	const dueEl = count.createSpan({ cls: 'apm-card-due' });
+	setIcon(dueEl.createSpan({ cls: 'apm-card-due-icon' }), 'calendar');
+	dueEl.createSpan({ text: due });
+
 	const { weeks, days } = weeksAndDays(row.daysLeft);
-	const due = moment(row.project.deadline, 'YYYY-MM-DD').format('ddd D MMM YYYY');
-	card.createDiv({ cls: 'apm-card-meta', text: `${plural(weeks, 'week')} ${plural(days, 'day')} · ${due}` });
+	card.createDiv({ cls: 'apm-card-meta', text: `${plural(weeks, 'week')} ${plural(days, 'day')}` });
 
 	// Tasks bar.
 	const pct = row.total ? Math.round((row.done / row.total) * 100) : 0;
 	const bar = card.createDiv({ cls: 'apm-card-bar', attr: { role: 'progressbar', 'aria-valuenow': String(pct) } });
 	bar.createDiv({ cls: 'apm-card-fill', attr: { style: `width:${pct}%` } });
 	const tasks = card.createDiv({ cls: 'apm-card-tasks' });
-	tasks.createSpan({ text: `${row.done} / ${plural(row.total, 'task')} done` });
+	tasks.createSpan({ text: `${row.done} / ${plural(row.total, 'task')} ` });
 	tasks.createSpan({ cls: 'apm-card-pct', text: `${pct}%` });
 }

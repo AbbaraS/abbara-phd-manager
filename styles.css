@@ -209,13 +209,13 @@
 }
 
 .apm-card-icon svg {
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 }
 
 .apm-card-name {
-	font-weight: var(--font-semibold);
-	font-size: var(--font-ui-large);
+	font-weight: var(--font-bold);
+	font-size: var(--font-ui-medium);
 	line-height: 1;
 }
 
@@ -227,15 +227,16 @@
 /* Big countdown number. */
 .apm-card-count {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: var(--size-4-1);
 }
 
 .apm-card-days {
-	font-size: 1.2em;
+	font-size: 1em;
 	font-weight: var(--font-bold);
 	line-height: 1;
-	letter-spacing: -0.02em;
+	letter-spacing: -0.08em;
 }
 
 .apm-card-label,
@@ -243,6 +244,31 @@
 .apm-card-tasks {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
+}
+
+/* Due date: right side of the countdown row, full-strength text so it stands out. */
+.apm-card-due {
+	display: inline-flex;
+	align-items: center;
+	align-self: center;
+	gap: var(--size-4-1);
+	margin-left: auto;
+	white-space: nowrap;
+	color: var(--text-normal);
+	font-weight: var(--font-medium);
+	font-size: var(--font-ui-small);
+	letter-spacing: -0.05em;
+	
+}
+
+.apm-card-due-icon {
+	display: inline-flex;
+	color: var(--apm-card-color);
+}
+
+.apm-card-due-icon svg {
+	width: 11px;
+	height: 11px;
 }
 
 /* Progress bar. */
