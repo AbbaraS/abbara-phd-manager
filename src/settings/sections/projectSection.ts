@@ -2,6 +2,7 @@ import { Setting, setIcon } from 'obsidian';
 import { Project, Role } from '../../models/types';
 import { projectColor, projectIcon } from '../../models/resolve';
 import { renderOptionList } from './optionList';
+import { daysUntil } from '../../utils/dates';
 import type { SectionContext } from '../SettingsTab';
 
 // One project row, plus its own types/statuses when it overrides the role's.
@@ -12,7 +13,7 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 	const row = new Setting(el)
 		.setClass('apm-project-row')
 		.setName(project.name || 'Untitled project')
-		.setDesc(`Badge key: ${role.id}-${project.id}`)
+		.setDesc(`Badge key: ${role.id}-${project.id}${dueText(project.deadline)}`)
 		.addText((t) => t.setPlaceholder('Name').setValue(project.name).onChange((v) => {
 			project.name = v;
 			ctx.save();
@@ -21,6 +22,14 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 			project.icon = v.trim();
 			ctx.save();
 		}))
+		.addText((t) => {
+			t.inputEl.type = 'date';
+			t.inputEl.title = 'Deadline (optional)';
+			t.setValue(project.deadline).onChange((v) => {
+				project.deadline = v;
+				ctx.save();
+			});
+		})
 		.addColorPicker((c) => c.setValue(shade).onChange((v) => {
 			project.color = v;
 			ctx.save();
@@ -64,4 +73,12 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 	};
 	if (project.types.length) nested('types', (box) => renderOptionList(box, 'type', project.types, shade, ctx));
 	if (project.statuses.length) nested('statuses', (box) => renderOptionList(box, 'status', project.statuses, shade, ctx));
+}
+
+// " · due in 38 days" for the row description, or '' with no deadline.
+function dueText(deadline: string): string {
+	const days = daysUntil(deadline);
+	if (days === null) return '';
+	if (days === 0) return ' · due today';
+	return days > 0 ? ` · due in ${days} days` : ` · ${-days} days overdue`;
 }

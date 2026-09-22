@@ -9,3 +9,8 @@ export function uniqueId(id: string, taken: string[]): string {
 	for (let n = 2; taken.includes(candidate); n++) candidate = `${id}-${n}`;
 	return candidate;
 }
+
+// Short random task id, e.g. "k3f9q" (36^5 ≈ 60 million combinations).
+export function newTaskId(): string {
+	return Math.floor(Math.random() * 36 ** 5).toString(36).padStart(5, '0');
+}

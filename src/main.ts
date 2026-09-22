@@ -9,10 +9,13 @@ import { registerCarryOnEnter } from './editor/carryOnEnter';
 import { registerBadgeClick } from './editor/badgeClick';
 import { registerTaskContextMenu } from './editor/taskContextMenu';
 import { buildBadgeIndex } from './models/badgeIndex';
+import { TaskStore } from './progress/TaskStore';
+import { PROGRESS_BLOCK, ProgressBlock, parseFilter } from './progress/ProgressBlock';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
 export default class ProjectManagerPlugin extends Plugin {
 	settings!: ManagerSettings;
+	tasks = new TaskStore(this);
 	rolesFile = new RolesFile(this, (roles) => void this.onRolesFileEdited(roles));
 	private toolbar = new ToolbarManager(this);
 	private settingsTab = new SettingsTab(this.app, this);
@@ -30,6 +33,12 @@ export default class ProjectManagerPlugin extends Plugin {
 		registerCarryOnEnter(this, () => this.settings.carryOnEnter, isStatus);
 		registerBadgeClick(this, roles);
 		registerTaskContextMenu(this, roles);
+
+		// Deadline dashboard, kept live by the task index.
+		this.tasks.register();
+		this.registerMarkdownCodeBlockProcessor(PROGRESS_BLOCK, (source, el, ctx) =>
+			ctx.addChild(new ProgressBlock(el, this, parseFilter(source))),
+		);
 
 		// Custom Badges may load after us, so sync once everything is ready.
 		this.app.workspace.onLayoutReady(() => this.pushBadges(false));
@@ -66,6 +75,7 @@ export default class ProjectManagerPlugin extends Plugin {
 		await this.rolesFile.save(this.settings.roles);
 		await this.pushBadges(false);
 		this.toolbar.refresh();
+		this.tasks.changed();
 	}
 
 	// Save everything except roles to data.json.
@@ -81,6 +91,7 @@ export default class ProjectManagerPlugin extends Plugin {
 			this.settings.roles = roles;
 			await this.pushBadges(false);
 			this.toolbar.refresh();
+			this.tasks.changed();
 		}
 		this.settingsTab.refreshIfOpen();
 	}

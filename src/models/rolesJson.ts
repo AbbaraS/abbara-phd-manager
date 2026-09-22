@@ -1,5 +1,6 @@
 import { Project, Role, TaskOption } from './types';
 import { slugify, uniqueId } from '../utils/ids';
+import { isIsoDate } from '../utils/dates';
 
 // Any object read from the file, before it is checked.
 type Raw = Record<string, unknown>;
@@ -34,6 +35,7 @@ const tidyProject = (p: Project) => ({
 	...(p.icon ? { icon: p.icon } : {}),
 	...(p.color ? { color: p.color } : {}),
 	...(p.hidden ? { hidden: true } : {}),
+	...(p.deadline ? { deadline: p.deadline } : {}),
 	...(p.types.length ? { types: p.types.map(tidyOption) } : {}),
 	...(p.statuses.length ? { statuses: p.statuses.map(tidyOption) } : {}),
 });
@@ -63,6 +65,7 @@ function toProject(raw: unknown, at: string): Project {
 		icon: text(o, 'icon', at),
 		color: colour(o, at),
 		hidden: flag(o, 'hidden', at),
+		deadline: date(o, 'deadline', at),
 		types: toOptions(o.types, `${at}.types`),
 		statuses: toOptions(o.statuses, `${at}.statuses`),
 	};
@@ -108,6 +111,13 @@ function text(o: Raw, key: string, at: string): string {
 	if (value === undefined || value === null) return '';
 	if (typeof value !== 'string') throw new Error(`${at}.${key} should be text in "quotes"`);
 	return value.trim();
+}
+
+// Optional "YYYY-MM-DD" field ('' when missing).
+function date(o: Raw, key: string, at: string): string {
+	const value = text(o, key, at);
+	if (value && !isIsoDate(value)) throw new Error(`${at}.${key} should be a date like "2026-12-01"`);
+	return value;
 }
 
 // Optional true/false field (false when missing).

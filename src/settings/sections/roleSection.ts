@@ -62,7 +62,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 	role.projects.forEach((project) => renderProject(details, role, project, ctx));
 	new Setting(details).addButton((b) => b.setButtonText('Add project').onClick(() => {
 		const id = uniqueId('project', role.projects.map((p) => p.id));
-		role.projects.push({ id, name: 'New project', icon: '', color: '', hidden: false, types: [], statuses: [] });
+		role.projects.push({ id, name: 'New project', icon: '', color: '', hidden: false, deadline: '', types: [], statuses: [] });
 		ctx.saveAndRedraw();
 	}));
 

@@ -17,6 +17,7 @@ export interface Project {
 	icon: string;           // Lucide icon name, empty = the role's icon
 	color: string;          // hex override, empty = auto shade of the role colour
 	hidden: boolean;        // true = left out of the toolbar menu, badges still kept
+	deadline: string;       // "YYYY-MM-DD", empty = none
 	types: TaskType[];      // own types, empty = inherit the role's types
 	statuses: TaskStatus[]; // own statuses, empty = inherit the role's statuses
 }

@@ -2,6 +2,7 @@ import { Plugin } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { nextTaskLine } from '../tasks/nextTaskLine';
 import { onEveryDocument } from './domEvents';
+import { newTaskId } from '../utils/ids';
 
 // Enter at the end of a badge task starts a new task with the same badges.
 // Listens before the editor does (capture phase), so plugins that also take over Enter,
@@ -42,7 +43,7 @@ function handleEnter(view: EditorView, dropKey: (key: string) => boolean): boole
 	const line = state.doc.lineAt(cursor.head);
 	if (cursor.head !== line.to) return false;
 
-	const next = nextTaskLine(line.text, dropKey);
+	const next = nextTaskLine(line.text, dropKey, newTaskId());
 	if (next === null) return false;
 
 	// Empty task: clear it, like Obsidian does for an empty list item.

@@ -6,6 +6,13 @@ export const badge = (key: string) => `\`[!!${key}]\``;
 // Plain badges only, e.g. `[!!phd-t-code]` (not `[!!note:text]` or icon|label forms).
 const PLAIN_BADGE = /`\[!!([^\]`:|]+)\]`/g;
 
+// Hidden task id badge, e.g. `[!!id:k3f9q]`. Copies of a task rolled over to later notes share it.
+export const idBadge = (id: string) => `\`[!!id:${id}]\``;
+const ID_BADGE = /`\[!!id:([a-z0-9]+)\]`/i;
+
+// The task's id, if it has one.
+export const taskIdOf = (line: string) => ID_BADGE.exec(line)?.[1].toLowerCase();
+
 // A markdown task line: "- [ ] ...", "* [x] ...".
 export const isTaskLine = (line: string) => /^\s*[-*+] \[.\] /.test(line);
 

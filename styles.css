@@ -163,3 +163,126 @@
 .cm-editor .inline-badge[data-inline-badge*="-s-"]:hover {
 	filter: brightness(1.08);
 }
+
+/* Task ids (`[!!id:k3f9q]`) are for counting only, so keep them out of sight. */
+.inline-badge[data-inline-badge="id"] {
+	display: none;
+}
+
+/* ---------- Deadline dashboard (```apm-progress``` block) ---------- */
+
+/* Responsive card grid. */
+.apm-progress {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: var(--size-4-3);
+	margin: var(--size-4-2) 0 var(--size-4-4);
+}
+
+/* One project: soft tint of its colour, accent strip on top. */
+.apm-card {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	padding: var(--size-4-3) var(--size-4-4);
+	border: 1px solid color-mix(in srgb, var(--apm-card-color) 30%, var(--background-modifier-border));
+	border-top: 3px solid var(--apm-card-color);
+	border-radius: var(--radius-l);
+	background: linear-gradient(180deg, color-mix(in srgb, var(--apm-card-color) 12%, var(--background-primary)), var(--background-primary) 70%);
+	box-shadow: var(--shadow-s);
+	font-variant-numeric: tabular-nums;
+}
+
+.apm-card-head {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+}
+
+/* Project icon in a round chip. */
+.apm-card-icon {
+	display: inline-flex;
+	padding: 6px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--apm-card-color) 20%, transparent);
+	color: var(--apm-card-color);
+}
+
+.apm-card-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.apm-card-name {
+	font-weight: var(--font-semibold);
+	line-height: 1.2;
+}
+
+.apm-card-role {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+/* Big countdown number. */
+.apm-card-count {
+	display: flex;
+	align-items: baseline;
+	gap: var(--size-4-2);
+}
+
+.apm-card-days {
+	font-size: 2em;
+	font-weight: var(--font-bold);
+	line-height: 1;
+	letter-spacing: -0.02em;
+}
+
+.apm-card-label,
+.apm-card-meta,
+.apm-card-tasks {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+/* Progress bar. */
+.apm-card-bar {
+	height: 6px;
+	border-radius: 999px;
+	background: var(--background-modifier-border);
+	overflow: hidden;
+}
+
+.apm-card-fill {
+	height: 100%;
+	border-radius: inherit;
+	background: var(--apm-card-color);
+	transition: width 300ms ease;
+}
+
+.apm-card-tasks {
+	display: flex;
+	justify-content: space-between;
+}
+
+.apm-card-pct {
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+}
+
+/* Due within a week / overdue. */
+.apm-card.is-soon .apm-card-days {
+	color: var(--color-orange);
+}
+
+.apm-card.is-overdue .apm-card-days,
+.apm-card.is-overdue .apm-card-label {
+	color: var(--text-error);
+}
+
+.apm-progress-empty {
+	padding: var(--size-4-3);
+	border: 1px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+}

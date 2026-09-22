@@ -2,6 +2,7 @@ import { MarkdownView } from 'obsidian';
 import type ProjectManagerPlugin from '../main';
 import { isDailyNote } from '../utils/dailyNotes';
 import { visibleRoles } from '../models/resolve';
+import { newTaskId } from '../utils/ids';
 import { buildTaskLine } from '../tasks/taskLine';
 import { insertTask } from '../tasks/insertTask';
 import { pickTask } from './pickTask';
@@ -37,7 +38,7 @@ export class ToolbarManager {
 		if (!this.shouldShow(view)) return;
 
 		const bar = renderToolbar(visibleRoles(this.plugin.settings.roles), (evt, role) =>
-			pickTask(evt, role, (choice) => insertTask(view.editor, buildTaskLine(choice))),
+			pickTask(evt, role, (choice) => insertTask(view.editor, buildTaskLine(choice, newTaskId()))),
 		);
 		// Sit between the note header and its content.
 		view.containerEl.insertBefore(bar, view.contentEl);

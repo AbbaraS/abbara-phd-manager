@@ -8,7 +8,7 @@ import { starterStatuses } from './statuses';
 // Small helpers so the lists below stay short.
 const type = (id: string, name: string, icon: string, color = ''): TaskType => ({ id, name, icon, color });
 const project = (id: string, name: string, icon = ''): Project =>
-	({ id, name, icon, color: '', hidden: false, types: [], statuses: [] });
+	({ id, name, icon, color: '', hidden: false, deadline: '', types: [], statuses: [] });
 
 export const DEFAULT_ROLES: Role[] = [
 	{
