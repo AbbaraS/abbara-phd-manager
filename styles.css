@@ -216,7 +216,7 @@
 .apm-card-name {
 	font-weight: var(--font-bold);
 	font-size: var(--font-ui-medium);
-	line-height: 1;
+	line-height: 1.1;
 }
 
 .apm-card-role {
@@ -271,12 +271,37 @@
 	height: 11px;
 }
 
+.apm-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.apm-card-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.apm-card-bar-row .apm-card-bar {
+  flex: 1;
+  margin: 0; /* clear any old vertical margin on the bar */
+}
+
 /* Progress bar. */
 .apm-card-bar {
 	height: 6px;
 	border-radius: 999px;
 	background: var(--background-modifier-border);
 	overflow: hidden;
+}
+
+.apm-card-pct {
+  min-width: 4ch;        /* stops the bar resizing between 0% and 100% */
+  text-align: right;
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
 }
 
 .apm-card-fill {
@@ -286,15 +311,6 @@
 	transition: width 300ms ease;
 }
 
-.apm-card-tasks {
-	display: flex;
-	justify-content: space-between;
-}
-
-.apm-card-pct {
-	font-weight: var(--font-semibold);
-	color: var(--text-normal);
-}
 
 /* Due within a week / overdue. */
 .apm-card.is-soon .apm-card-days {
