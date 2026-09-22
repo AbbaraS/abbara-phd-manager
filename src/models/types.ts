@@ -28,6 +28,7 @@ export interface Role {
 export interface ManagerSettings {
 	roles: Role[];
 	dailyNotesOnly: boolean;     // show the toolbar only on daily notes
+	carryOnEnter: boolean;       // Enter on a badge task starts a new task with the same badges
 	syncBadges: boolean;         // push role/project/type badges into Custom Badges
 	managedBadgeKeys: string[];  // badge keys this plugin created, so it can tidy them up
 }

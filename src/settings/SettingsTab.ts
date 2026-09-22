@@ -43,6 +43,13 @@ export class SettingsTab extends PluginSettingTab {
 				ctx.save();
 			}));
 		new Setting(containerEl)
+			.setName('Keep badges on Enter')
+			.setDesc('Pressing Enter at the end of a task starts the next task with the same role, project and type.')
+			.addToggle((t) => t.setValue(settings.carryOnEnter).onChange((v) => {
+				settings.carryOnEnter = v;
+				ctx.save();
+			}));
+		new Setting(containerEl)
 			.setName('Sync with Custom Badges')
 			.setDesc('Create a badge for every role, project and task type.')
 			.addToggle((t) => t.setValue(settings.syncBadges).onChange((v) => {

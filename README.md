@@ -11,6 +11,10 @@ Roles → Projects → Tasks for Obsidian, visualised with [Custom Badges](../cu
 - [ ] `[!!phd-tts-3d]` `[!!phd-t-code]` 
 ```
 
+Press **Enter** at the end of a task to start the next one with the same badges, so you can add
+several tasks for one project in a row. Enter on a task with no text yet clears it and ends the list.
+(Turn off with *Keep badges on Enter* in settings.)
+
 Every role, project and type is pushed into Custom Badges as a badge, so the line above renders as coloured badges.
 
 ## Folder structure
@@ -40,8 +44,11 @@ src/
     ToolbarManager.ts              adds/removes the toolbar on notes
     renderToolbar.ts               builds the role buttons
     pickTask.ts                    project → type menus
+  editor/
+    carryOnEnter.ts                Enter on a badge task → new task with the same badges
   tasks/
     taskLine.ts                    builds the "- [ ] badges" line
+    nextTaskLine.ts                works out that next line (pure)
     insertTask.ts                  puts the line in the editor
   utils/
     colour.ts                      hex/HSL helpers and shade generator

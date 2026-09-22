@@ -8,6 +8,7 @@ export const cloneRoles = () => structuredClone(DEFAULT_ROLES);
 export const DEFAULT_SETTINGS: ManagerSettings = {
 	roles: cloneRoles(),
 	dailyNotesOnly: true,
+	carryOnEnter: true,
 	syncBadges: true,
 	managedBadgeKeys: [],
 };

@@ -5,6 +5,7 @@ import { SettingsTab } from './settings/SettingsTab';
 import { ToolbarManager } from './toolbar/ToolbarManager';
 import { syncBadges } from './integrations/customBadges';
 import { RolesFile } from './storage/RolesFile';
+import { registerCarryOnEnter } from './editor/carryOnEnter';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
 export default class ProjectManagerPlugin extends Plugin {
@@ -21,6 +22,7 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.addSettingTab(this.settingsTab);
 		this.toolbar.register();
 		this.rolesFile.watch();
+		registerCarryOnEnter(this, () => this.settings.carryOnEnter);
 
 		// Custom Badges may load after us, so sync once everything is ready.
 		this.app.workspace.onLayoutReady(() => this.pushBadges(false));
