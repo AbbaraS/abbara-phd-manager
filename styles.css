@@ -1,11 +1,15 @@
 /* ---------- Daily note toolbar ---------- */
 
+/*	
+		`--size-4-N` means N × 4px. So --size-4-3 is 12px. 
+	*/
+
 /* Row of role buttons above the note. */
 .apm-toolbar {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--size-4-2);
-	padding: var(--size-4-2) var(--size-4-4);
+	padding: var(--size-4-1) var(--size-4-4);
 	border-bottom: 1px solid var(--background-modifier-border);
 	background: var(--background-primary);
 }
@@ -15,7 +19,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: var(--size-4-1);
-	padding: var(--size-4-1) var(--size-4-3);
+	padding: 2px var(--size-4-1);
 	border: 1px solid var(--apm-role-color);
 	border-radius: var(--radius-m);
 	background: color-mix(in srgb, var(--apm-role-color) 15%, transparent);
@@ -59,13 +63,39 @@
 	cursor: pointer;
 }
 
-/* Small colour dot next to a project name. */
+/* Project icon in its colour, next to the project name. */
 .apm-swatch {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
+	display: inline-flex;
+	vertical-align: middle;
 	margin-right: var(--size-4-2);
-	border-radius: 50%;
+	color: var(--apm-swatch-color);
+}
+
+.apm-swatch svg {
+	width: 14px;
+	height: 14px;
+}
+
+/* Hidden roles/projects: faded, still editable. */
+.apm-role.apm-hidden > .apm-role-summary,
+.apm-project-row.apm-hidden {
+	opacity: 0.55;
+}
+
+.apm-hidden-tag {
+	padding: 0 var(--size-4-2);
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal);
+}
+
+/* Short explanation under a settings heading. */
+.apm-hint {
+	margin-bottom: var(--size-4-2);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
 }
 
 /* Indent project-level types. */
@@ -87,4 +117,49 @@
 	border-radius: var(--radius-s);
 	color: var(--text-error);
 	border: 1px solid var(--text-error);
+}
+
+/* ---------- Task badges (drawn by Custom Badges) ---------- */
+
+/*
+	Custom Badges puts the badge key in data-inline-badge and the colour in --badge-color ("r, g, b").
+	Our keys contain "-t-" for types and "-s-" for statuses, e.g. "phd-t-code", "phd-s-done".
+*/
+
+/* Types: soft pastel pills. Light theme = pastel fill with normal text. */
+.inline-badge[data-inline-badge*="-t-"] {
+	border-radius: 999px;
+	padding-inline: 2px 4px;
+	background-color: rgba(var(--badge-color), 1);
+	color: var(--text-normal);
+	font-weight: var(--font-medium);
+}
+
+/* Dark theme = pastel text on a faint pastel tint. */
+.theme-dark .inline-badge[data-inline-badge*="-t-"] {
+	background-color: rgba(var(--badge-color), 0.18);
+	color: rgb(var(--badge-color));
+}
+
+/* Statuses: solid, bold, uppercase so they stand out from everything else. */
+.inline-badge[data-inline-badge*="-s-"] {
+	padding-inline: 2px 6px;
+	border-radius: var(--radius-s);
+	background-color: rgb(var(--badge-color));
+	box-shadow: var(--shadow-s);
+	color: var(--text-on-accent);
+	font-weight: var(--font-bold);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+/* Both open a dropdown when clicked in the editor. */
+.cm-editor .inline-badge[data-inline-badge*="-t-"],
+.cm-editor .inline-badge[data-inline-badge*="-s-"] {
+	cursor: pointer;
+}
+
+.cm-editor .inline-badge[data-inline-badge*="-t-"]:hover,
+.cm-editor .inline-badge[data-inline-badge*="-s-"]:hover {
+	filter: brightness(1.08);
 }

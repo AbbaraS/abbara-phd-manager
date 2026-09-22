@@ -1,5 +1,6 @@
 import { Project, Role, TaskType } from '../models/types';
 import { projectKey, roleKey, typeKey } from '../models/resolve';
+import { badge } from './taskBadges';
 
 // What the user picked in the toolbar.
 export interface TaskChoice {
@@ -7,9 +8,6 @@ export interface TaskChoice {
 	project?: Project;
 	type?: TaskType;
 }
-
-// Inline badge syntax used by Custom Badges.
-const badge = (key: string) => `\`[!!${key}]\``;
 
 // Build a new task line, e.g. "- [ ] `[!!phd-tts-3d]` `[!!phd-t-code]` ".
 export function buildTaskLine({ role, project, type }: TaskChoice): string {

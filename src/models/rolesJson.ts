@@ -1,4 +1,4 @@
-import { Project, Role, TaskType } from './types';
+import { Project, Role, TaskOption } from './types';
 import { slugify, uniqueId } from '../utils/ids';
 
 // Any object read from the file, before it is checked.
@@ -19,22 +19,27 @@ export function stringifyRoles(roles: Role[]): string {
 		name: r.name,
 		icon: r.icon,
 		color: r.color,
+		...(r.hidden ? { hidden: true } : {}),
 		projects: r.projects.map(tidyProject),
-		types: r.types.map(tidyType),
+		types: r.types.map(tidyOption),
+		...(r.statuses.length ? { statuses: r.statuses.map(tidyOption) } : {}),
 	}));
 	return JSON.stringify({ roles: tidy }, null, '\t') + '\n';
 }
 
-// Project without empty colour / types.
+// Project without empty icon / colour / lists.
 const tidyProject = (p: Project) => ({
 	id: p.id,
 	name: p.name,
+	...(p.icon ? { icon: p.icon } : {}),
 	...(p.color ? { color: p.color } : {}),
-	...(p.types.length ? { types: p.types.map(tidyType) } : {}),
+	...(p.hidden ? { hidden: true } : {}),
+	...(p.types.length ? { types: p.types.map(tidyOption) } : {}),
+	...(p.statuses.length ? { statuses: p.statuses.map(tidyOption) } : {}),
 });
 
-// Task type without an empty colour.
-const tidyType = (t: TaskType) => ({ id: t.id, name: t.name, icon: t.icon, ...(t.color ? { color: t.color } : {}) });
+// Type or status without an empty colour.
+const tidyOption = (t: TaskOption) => ({ id: t.id, name: t.name, icon: t.icon, ...(t.color ? { color: t.color } : {}) });
 
 // One role; only `name` (or `id`) is required.
 function toRole(raw: unknown, at: string): Role {
@@ -43,19 +48,28 @@ function toRole(raw: unknown, at: string): Role {
 		...named(o, at),
 		icon: text(o, 'icon', at) || 'circle',
 		color: colour(o, at) || '#888888',
+		hidden: flag(o, 'hidden', at),
 		projects: withIds(listOf(o.projects, `${at}.projects`).map((p, i) => toProject(p, `${at}.projects[${i}]`))),
-		types: toTypes(o.types, `${at}.types`),
+		types: toOptions(o.types, `${at}.types`),
+		statuses: toOptions(o.statuses, `${at}.statuses`),
 	};
 }
 
-// One project; colour and types are optional.
+// One project; everything but the name is optional.
 function toProject(raw: unknown, at: string): Project {
 	const o = asObject(raw, at);
-	return { ...named(o, at), color: colour(o, at), types: toTypes(o.types, `${at}.types`) };
+	return {
+		...named(o, at),
+		icon: text(o, 'icon', at),
+		color: colour(o, at),
+		hidden: flag(o, 'hidden', at),
+		types: toOptions(o.types, `${at}.types`),
+		statuses: toOptions(o.statuses, `${at}.statuses`),
+	};
 }
 
-// A list of task types.
-function toTypes(raw: unknown, at: string): TaskType[] {
+// A list of task types or statuses.
+function toOptions(raw: unknown, at: string): TaskOption[] {
 	return withIds(listOf(raw, at).map((t, i) => {
 		const here = `${at}[${i}]`;
 		const o = asObject(t, here);
@@ -94,6 +108,14 @@ function text(o: Raw, key: string, at: string): string {
 	if (value === undefined || value === null) return '';
 	if (typeof value !== 'string') throw new Error(`${at}.${key} should be text in "quotes"`);
 	return value.trim();
+}
+
+// Optional true/false field (false when missing).
+function flag(o: Raw, key: string, at: string): boolean {
+	const value = o[key];
+	if (value === undefined || value === null) return false;
+	if (typeof value !== 'boolean') throw new Error(`${at}.${key} should be true or false (no quotes)`);
+	return value;
 }
 
 // Optional list field ([] when missing).

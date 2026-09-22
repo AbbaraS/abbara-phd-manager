@@ -51,7 +51,7 @@ export class SettingsTab extends PluginSettingTab {
 			}));
 		new Setting(containerEl)
 			.setName('Sync with Custom Badges')
-			.setDesc('Create a badge for every role, project and task type.')
+			.setDesc('Create a badge for every role, project, task type and status.')
 			.addToggle((t) => t.setValue(settings.syncBadges).onChange((v) => {
 				settings.syncBadges = v;
 				ctx.save();
@@ -69,7 +69,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.addButton((b) => b.setButtonText('Add role').setCta().onClick(() => {
 				const id = uniqueId(slugify('role'), settings.roles.map((r) => r.id));
-				settings.roles.push({ id, name: 'New role', icon: 'circle', color: '#888888', projects: [], types: [] });
+				settings.roles.push({ id, name: 'New role', icon: 'circle', color: '#888888', hidden: false, projects: [], types: [], statuses: [] });
 				this.openRoles.add(id);
 				ctx.saveAndRedraw();
 			}))

@@ -1,6 +1,7 @@
 import { MarkdownView } from 'obsidian';
 import type ProjectManagerPlugin from '../main';
 import { isDailyNote } from '../utils/dailyNotes';
+import { visibleRoles } from '../models/resolve';
 import { buildTaskLine } from '../tasks/taskLine';
 import { insertTask } from '../tasks/insertTask';
 import { pickTask } from './pickTask';
@@ -35,16 +36,16 @@ export class ToolbarManager {
 		view.containerEl.querySelector(`:scope > .${TOOLBAR_CLASS}`)?.remove();
 		if (!this.shouldShow(view)) return;
 
-		const bar = renderToolbar(this.plugin.settings.roles, (evt, role) =>
+		const bar = renderToolbar(visibleRoles(this.plugin.settings.roles), (evt, role) =>
 			pickTask(evt, role, (choice) => insertTask(view.editor, buildTaskLine(choice))),
 		);
 		// Sit between the note header and its content.
 		view.containerEl.insertBefore(bar, view.contentEl);
 	}
 
-	// Daily notes only, unless the setting says every note.
+	// Daily notes only (unless the setting says every note), and only with a visible role.
 	private shouldShow(view: MarkdownView): boolean {
-		if (!this.plugin.settings.roles.length) return false;
+		if (!visibleRoles(this.plugin.settings.roles).length) return false;
 		return !this.plugin.settings.dailyNotesOnly || isDailyNote(this.plugin.app, view.file);
 	}
 }

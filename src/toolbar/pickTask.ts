@@ -1,6 +1,6 @@
 import { Menu } from 'obsidian';
 import { Project, Role } from '../models/types';
-import { typesFor } from '../models/resolve';
+import { projectIcon, typesFor, visibleProjects } from '../models/resolve';
 import { TaskChoice } from '../tasks/taskLine';
 
 type Point = { x: number; y: number };
@@ -27,13 +27,14 @@ export function pickTask(evt: MouseEvent, role: Role, done: (c: TaskChoice) => v
 		window.setTimeout(() => pickType(at, role, project, done), 0);
 	};
 
-	if (!role.projects.length) return next();
+	const projects = visibleProjects(role);
+	if (!projects.length) return next();
 
 	const menu = new Menu();
 	menu.addItem((i) => i.setTitle(`${role.name} (no project)`).setIcon(role.icon).onClick(() => next()));
 	menu.addSeparator();
-	role.projects.forEach((project) =>
-		menu.addItem((i) => i.setTitle(project.name).setIcon('folder').onClick(() => next(project))),
+	projects.forEach((project) =>
+		menu.addItem((i) => i.setTitle(project.name).setIcon(projectIcon(role, project)).onClick(() => next(project))),
 	);
 	menu.showAtMouseEvent(evt);
 }

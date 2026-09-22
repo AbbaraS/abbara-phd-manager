@@ -1,4 +1,5 @@
 import { Project, Role, TaskType } from '../models/types';
+import { starterStatuses } from './statuses';
 
 // Starting roles, projects, themes and task types, built into the plugin.
 // Only used for a fresh install and "Reset to defaults".
@@ -6,15 +7,16 @@ import { Project, Role, TaskType } from '../models/types';
 
 // Small helpers so the lists below stay short.
 const type = (id: string, name: string, icon: string, color = ''): TaskType => ({ id, name, icon, color });
-const project = (id: string, name: string, types: TaskType[] = []): Project => ({ id, name, color: '', types });
+const project = (id: string, name: string, icon = ''): Project =>
+	({ id, name, icon, color: '', hidden: false, types: [], statuses: [] });
 
 export const DEFAULT_ROLES: Role[] = [
 	{
-		id: 'phd', name: 'PhD', icon: 'book-heart', color: '#C62525',
+		id: 'phd', name: 'PhD', icon: 'book-heart', color: '#C62525', hidden: false, statuses: starterStatuses(),
 		projects: [
-			project('tts-3d', 'TTS 3D'),
-			project('tts-2d', 'TTS 2D multiview'),
-			project('jan-report', 'January Report'),
+			project('tts-3d', 'TTS 3D', 'box'),
+			project('tts-2d', 'TTS 2D multiview', 'layers'),
+			project('jan-report', 'January Report', 'file-text'),
 		],
 		types: [
 			type('code', 'Code', 'code'),
@@ -23,7 +25,7 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'gta', name: 'GTA', icon: 'id-card-lanyard', color: '#32C2CC',
+		id: 'gta', name: 'GTA', icon: 'id-card-lanyard', color: '#32C2CC', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('comp', 'COMP'),
 			project('eeen', 'EEEN'),
@@ -34,7 +36,7 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'reslife', name: 'ResLife', icon: 'handshake', color: '#339933',
+		id: 'reslife', name: 'ResLife', icon: 'handshake', color: '#339933', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('schedule', 'Schedule'),
 			project('timesheet', 'Timesheet'),
@@ -44,7 +46,7 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'jobshop', name: 'JobShop', icon: 'cake-slice', color: '#FF7F50',
+		id: 'jobshop', name: 'JobShop', icon: 'cake-slice', color: '#FF7F50', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('wp-website', 'WP Website'),
 		],
@@ -53,7 +55,7 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'obsidian', name: 'Obsidian', icon: 'obsidian-new', color: '#CACACA',
+		id: 'obsidian', name: 'Obsidian', icon: 'obsidian-new', color: '#CACACA', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('custom-badges', 'custom-badges'),
 			project('phd-manager', 'abbara-phd-manager'),
@@ -65,7 +67,7 @@ export const DEFAULT_ROLES: Role[] = [
 		],
 	},
 	{
-		id: 'vscode', name: 'VS Code', icon: 'code-xml', color: '#4F6BED',
+		id: 'vscode', name: 'VS Code', icon: 'code-xml', color: '#4F6BED', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('abbara-theme', 'Abbara theme'),
 		],

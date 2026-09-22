@@ -1,6 +1,6 @@
 import { App, Plugin } from 'obsidian';
-import { Role } from '../models/types';
-import { projectColor, projectKey, roleKey, typeKey } from '../models/resolve';
+import { Project, Role, TaskOption } from '../models/types';
+import { OptionKind, optionBadgeColor, optionKey, projectColor, projectIcon, projectKey, roleKey } from '../models/resolve';
 
 // Shape of one badge in the Custom Badges plugin's settings.
 interface BadgeDefinition {
@@ -32,16 +32,23 @@ export function getCustomBadges(app: App): CustomBadgesPlugin | null {
 const badge = (key: string, label: string, icon: string, color: string): BadgeDefinition =>
 	({ key, label, icon, color, placeholder: 'default', placeholderText: '' });
 
-// Every badge the current roles need: one per role, project and type.
+// Every badge the current roles need: one per role, project, type and status.
+// Hidden roles and projects are included, so tasks already in notes keep their badges.
 export function buildBadges(roles: Role[]): BadgeDefinition[] {
 	const out: BadgeDefinition[] = [];
+	// Badges for a list of types or statuses; `base` seeds the auto colours.
+	const addOptions = (kind: OptionKind, role: Role, list: TaskOption[], base: string, project?: Project) =>
+		list.forEach((o) => out.push(badge(optionKey(kind, role, o, project), o.name, o.icon, optionBadgeColor(kind, list, o, base))));
+
 	for (const role of roles) {
 		out.push(badge(roleKey(role), role.name, role.icon, role.color));
-		role.types.forEach((t) => out.push(badge(typeKey(role, t), t.name, t.icon, t.color || role.color)));
+		addOptions('type', role, role.types, role.color);
+		addOptions('status', role, role.statuses, role.color);
 		for (const project of role.projects) {
 			const shade = projectColor(role, project);
-			out.push(badge(projectKey(role, project), `${role.name} | ${project.name}`, role.icon, shade));
-			project.types.forEach((t) => out.push(badge(typeKey(role, t, project), t.name, t.icon, t.color || shade)));
+			out.push(badge(projectKey(role, project), `${role.name} | ${project.name}`, projectIcon(role, project), shade));
+			addOptions('type', role, project.types, shade, project);
+			addOptions('status', role, project.statuses, shade, project);
 		}
 	}
 	return out;
