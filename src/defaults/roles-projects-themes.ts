@@ -1,7 +1,8 @@
 import { Project, Role, TaskType } from '../models/types';
 
-// Default roles, projects, themes and task types.
-// Edit this file to change what a fresh install (or "Reset to defaults") starts with.
+// Starting roles, projects, themes and task types, built into the plugin.
+// Only used for a fresh install and "Reset to defaults".
+// Your live roles are in roles-projects-themes.json in the plugin folder (edit that to change them now).
 
 // Small helpers so the lists below stay short.
 const type = (id: string, name: string, icon: string, color = ''): TaskType => ({ id, name, icon, color });
@@ -16,10 +17,9 @@ export const DEFAULT_ROLES: Role[] = [
 			project('jan-report', 'January Report'),
 		],
 		types: [
-			type('read', 'Reading', 'book-open'),
-			type('code', 'Coding', 'code'),
-			type('write', 'Writing', 'pen-line'),
-			type('meet', 'Meeting', 'users'),
+			type('code', 'Code', 'code'),
+			type('write', 'Write', 'pen-line'),
+			type('email', 'Email', 'mail'),
 		],
 	},
 	{
@@ -29,24 +29,27 @@ export const DEFAULT_ROLES: Role[] = [
 			project('eeen', 'EEEN'),
 		],
 		types: [
-			type('mark', 'Marking', 'check-check'),
-			type('teach', 'Teaching', 'presentation'),
+			type('lab', 'Lab', 'presentation'),
 			type('admin', 'Admin', 'clipboard-list'),
 		],
 	},
 	{
 		id: 'reslife', name: 'ResLife', icon: 'handshake', color: '#339933',
-		projects: [],
+		projects: [
+			project('schedule', 'Schedule'),
+			project('timesheet', 'Timesheet'),
+		],
 		types: [
-			type('shift', 'Shift', 'calendar-clock'),
-			type('admin', 'Admin', 'clipboard-list'),
+			type('shiftswap', 'Shift swap', 'calendar-clock'),
 		],
 	},
 	{
 		id: 'jobshop', name: 'JobShop', icon: 'cake-slice', color: '#FF7F50',
-		projects: [],
+		projects: [
+			project('wp-website', 'WP Website'),
+		],
 		types: [
-			type('admin', 'Admin', 'clipboard-list'),
+			type('addshift', 'Add shift', 'clipboard-list'),
 		],
 	},
 	{

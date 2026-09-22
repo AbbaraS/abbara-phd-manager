@@ -20,9 +20,10 @@ src/
   main.ts                          plugin entry: loads settings, wires everything
   models/
     types.ts                       Role, Project, TaskType, ManagerSettings
+    rolesJson.ts                   read/write the roles file (checks + fills gaps)
     resolve.ts                     derived values: project shade, types, badge keys
   defaults/
-    roles-projects-themes.ts       ← your default roles/projects/types (edit me)
+    roles-projects-themes.ts       starting roles for a fresh install / "Reset to defaults"
   settings/
     defaults.ts                    default plugin settings
     SettingsTab.ts                 settings page shell
@@ -30,6 +31,9 @@ src/
       roleSection.ts               one role block
       projectSection.ts            one project row
       typeList.ts                  editable list of task types
+      rolesFileInfo.ts             "Edit as code" note + file errors
+  storage/
+    RolesFile.ts                   keeps roles-projects-themes.json and settings in sync
   integrations/
     customBadges.ts                sync badges into the Custom Badges plugin
   toolbar/
@@ -45,6 +49,38 @@ src/
     ids.ts                         slugs and unique ids
 styles.css                         toolbar + settings styles
 ```
+
+## Edit roles as code
+
+Your roles live in `roles-projects-themes.json` in the plugin folder
+(`.obsidian/plugins/abbara-phd-manager/`). The settings page and the file stay in sync:
+
+- Change something in settings → the file is rewritten.
+- Save the file in any editor → settings, toolbar and badges update within ~2 seconds.
+- If the file has a mistake, it is not loaded; settings shows the error and won't overwrite the file until it's fixed.
+
+Only `name` is required; everything else is filled in (`id` from the name, icon `circle`, auto colours):
+
+```json
+{
+	"roles": [
+		{
+			"id": "phd", "name": "PhD", "icon": "book-heart", "color": "#C62525",
+			"projects": [
+				{ "id": "tts-3d", "name": "TTS 3D" },
+				{ "name": "January Report", "color": "#8B0000" }
+			],
+			"types": [
+				{ "id": "code", "name": "Code", "icon": "code" },
+				{ "id": "bug", "name": "Bug", "icon": "bug", "color": "#f44336" }
+			]
+		}
+	]
+}
+```
+
+A project gets its own task types by adding a `types` list; leave it out to use the role's.
+`data.json` now only holds plugin options (daily notes only, badge sync).
 
 ## Badge keys
 

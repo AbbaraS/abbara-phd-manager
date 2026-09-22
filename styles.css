@@ -79,3 +79,12 @@
 .apm-type-row input[type="text"] {
 	width: 9em;
 }
+
+/* Error shown when the roles file can't be read. */
+.apm-file-error {
+	margin-bottom: var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3);
+	border-radius: var(--radius-s);
+	color: var(--text-error);
+	border: 1px solid var(--text-error);
+}

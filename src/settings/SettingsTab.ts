@@ -2,6 +2,7 @@ import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import type ProjectManagerPlugin from '../main';
 import { cloneRoles } from './defaults';
 import { renderRole } from './sections/roleSection';
+import { renderRolesFileInfo } from './sections/rolesFileInfo';
 import { slugify, uniqueId } from '../utils/ids';
 
 // Shared helpers passed to every settings section.
@@ -55,6 +56,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		// Roles.
 		new Setting(containerEl).setName('Roles').setHeading();
+		renderRolesFileInfo(containerEl, plugin.rolesFile);
 		settings.roles.forEach((role) => renderRole(containerEl, settings.roles, role, ctx));
 
 		new Setting(containerEl)
@@ -66,7 +68,13 @@ export class SettingsTab extends PluginSettingTab {
 			}))
 			.addButton((b) => b.setButtonText('Reset to defaults').setWarning().onClick(() => {
 				settings.roles = cloneRoles();
+				plugin.rolesFile.error = ''; // an explicit reset may overwrite a broken file
 				ctx.saveAndRedraw();
 			}));
+	}
+
+	// Redraw if the page is showing (e.g. after the roles file was edited).
+	refreshIfOpen(): void {
+		if (this.containerEl.isConnected) this.display();
 	}
 }
