@@ -14,17 +14,21 @@ function dailyNoteOptions(app: App): DailyNoteOptions {
 	return internal?.getPluginById('daily-notes')?.instance?.options ?? {};
 }
 
-// True if `file` sits where a daily note would, with a name matching the date format.
-export function isDailyNote(app: App, file: TFile | null): boolean {
-	if (!file || file.extension !== 'md') return false;
+// The day a daily note is for ("YYYY-MM-DD"), or null if `file` is not a daily note.
+export function dailyNoteDate(app: App, file: TFile | null): string | null {
+	if (!file || file.extension !== 'md') return null;
 	const { folder = '', format = 'YYYY-MM-DD' } = dailyNoteOptions(app);
 
 	// Path relative to the daily notes folder, without ".md".
 	const root = normalizePath(folder || '/').replace(/^\/$/, '');
 	const path = file.path.replace(/\.md$/, '');
-	if (root && !path.startsWith(root + '/')) return false;
+	if (root && !path.startsWith(root + '/')) return null;
 	const relative = root ? path.slice(root.length + 1) : path;
 
 	// Strict parse so "notes about dates" do not count.
-	return moment(relative, format, true).isValid();
+	const date = moment(relative, format, true);
+	return date.isValid() ? date.format('YYYY-MM-DD') : null;
 }
+
+// True if `file` sits where a daily note would, with a name matching the date format.
+export const isDailyNote = (app: App, file: TFile | null) => dailyNoteDate(app, file) !== null;

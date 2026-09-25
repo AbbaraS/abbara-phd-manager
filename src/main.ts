@@ -11,6 +11,7 @@ import { registerTaskContextMenu } from './editor/taskContextMenu';
 import { buildBadgeIndex } from './models/badgeIndex';
 import { TaskStore } from './progress/TaskStore';
 import { PROGRESS_BLOCK, ProgressBlock, parseFilter } from './progress/ProgressBlock';
+import { TaskSorter } from './sort/TaskSorter';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
 export default class ProjectManagerPlugin extends Plugin {
@@ -18,6 +19,7 @@ export default class ProjectManagerPlugin extends Plugin {
 	tasks = new TaskStore(this);
 	rolesFile = new RolesFile(this, (roles) => void this.onRolesFileEdited(roles));
 	private toolbar = new ToolbarManager(this);
+	sorter = new TaskSorter(this);
 	private settingsTab = new SettingsTab(this.app, this);
 
 	// Save shortly after the user stops typing.
@@ -39,6 +41,9 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(PROGRESS_BLOCK, (source, el, ctx) =>
 			ctx.addChild(new ProgressBlock(el, this, parseFilter(source))),
 		);
+
+		// Task order: command + auto-sort of new daily notes.
+		this.sorter.register();
 
 		// Custom Badges may load after us, so sync once everything is ready.
 		this.app.workspace.onLayoutReady(() => this.pushBadges(false));

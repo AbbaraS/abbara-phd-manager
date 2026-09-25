@@ -10,6 +10,7 @@ export interface Progress {
 // One note's tasks, with its last-modified time (the newest copy decides the project).
 export interface NoteTasks {
 	time: number;
+	date: string; // "YYYY-MM-DD": the daily note's day, else the day the file was created
 	tasks: TaskRecord[];
 }
 

@@ -17,6 +17,25 @@ several tasks for one project in a row. Enter on a task with no text yet clears 
 
 Every role, project and type is pushed into Custom Badges as a badge, so the line above renders as coloured badges.
 
+## Task order
+
+Task lists are ordered by **role → project → due date → created date**:
+
+- Role and project follow their order in settings (role-only tasks come before that role's projects).
+- Due date is the Tasks plugin's `📅 YYYY-MM-DD`; soonest first, tasks without one after.
+- Created date is `➕ YYYY-MM-DD` if the line has one, else the first daily note the task appears in (matched by its `id` badge). Oldest first.
+- Ties keep their current order. Subtasks move with their parent. Tasks with no role badge go last. Code blocks are never touched.
+
+It runs automatically when a new daily note is created (after Rollover adds yesterday's tasks; turn off with
+*Sort new daily notes*), and any time with the sort button at the right of the toolbar or the
+**Sort tasks in this note** command (one undo step). Reorder roles and projects in settings with the ↑ ↓ buttons.
+
+## Editing tasks
+
+- **New project…** at the bottom of a role's toolbar menu opens a popup (name, icon, deadline, colour, own types/statuses), saves the project, then carries on to the type menu.
+- Click a role/project badge on a task (or right-click → *Set project*) to move it to another project of that role. Its type and status carry over when the new project has one with the same id.
+- Click a type or status badge (or right-click → *Set task type / status*) to change it.
+
 ## Folder structure
 
 ```
@@ -42,14 +61,21 @@ src/
     customBadges.ts                sync badges into the Custom Badges plugin
   toolbar/
     ToolbarManager.ts              adds/removes the toolbar on notes
-    renderToolbar.ts               builds the role buttons
+    renderToolbar.ts               builds the role buttons + sort button
     pickTask.ts                    project → type menus
+    NewProjectModal.ts             "New project…" popup
   editor/
     carryOnEnter.ts                Enter on a badge task → new task with the same badges
   tasks/
     taskLine.ts                    builds the "- [ ] badges" line
     nextTaskLine.ts                works out that next line (pure)
     insertTask.ts                  puts the line in the editor
+  sort/
+    TaskSorter.ts                  command + auto-sort of new daily notes
+    sortLines.ts                   reorders list blocks (pure)
+    listBlocks.ts                  finds lists and their items (pure)
+    sortKey.ts                     role → project → due → created comparison
+    firstSeen.ts                   day each task was first written down
   utils/
     colour.ts                      hex/HSL helpers and shade generator
     dailyNotes.ts                  "is this a daily note?"

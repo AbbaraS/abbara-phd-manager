@@ -1,7 +1,9 @@
-import { Events, Plugin, TAbstractFile, TFile, debounce } from 'obsidian';
+import { Events, Plugin, TAbstractFile, TFile, debounce, moment } from 'obsidian';
 import { BadgeEntry } from '../models/badgeIndex';
 import { scanTasks } from './scanTasks';
 import { NoteTasks, Progress, countProgress } from './countProgress';
+import { firstSeenDates } from '../sort/firstSeen';
+import { dailyNoteDate } from '../utils/dailyNotes';
 
 // Keeps every badge task in the vault indexed, and fires "updated" when anything changes.
 export class TaskStore extends Events {
@@ -26,6 +28,7 @@ export class TaskStore extends Events {
 			const note = this.notes.get(oldPath);
 			if (!note) return;
 			this.notes.delete(oldPath);
+			if (file instanceof TFile) note.date = this.dateOf(file);
 			this.notes.set(file.path, note);
 		}));
 	}
@@ -33,6 +36,11 @@ export class TaskStore extends Events {
 	// Done / total per project badge key.
 	progress(index: Map<string, BadgeEntry>): Map<string, Progress> {
 		return countProgress(this.notes.values(), index);
+	}
+
+	// Day each task was first written down, by copy key (see sort/firstSeen.ts).
+	firstSeen(): Map<string, string> {
+		return firstSeenDates(this.notes.values());
 	}
 
 	// Read every note that has tasks.
@@ -54,7 +62,12 @@ export class TaskStore extends Events {
 			if (this.notes.delete(file.path)) this.changed();
 			return;
 		}
-		this.notes.set(file.path, { time: file.stat.mtime, tasks });
+		this.notes.set(file.path, { time: file.stat.mtime, date: this.dateOf(file), tasks });
 		this.changed();
+	}
+
+	// Daily note day from the file name (reliable after copying a vault), else the file's creation day.
+	private dateOf(file: TFile): string {
+		return dailyNoteDate(this.plugin.app, file) ?? moment(file.stat.ctime).format('YYYY-MM-DD');
 	}
 }

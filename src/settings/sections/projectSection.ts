@@ -2,6 +2,7 @@ import { Setting, setIcon } from 'obsidian';
 import { Project, Role } from '../../models/types';
 import { projectColor, projectIcon } from '../../models/resolve';
 import { renderOptionList } from './optionList';
+import { moveButtons } from './moveButtons';
 import { daysUntil } from '../../utils/dates';
 import type { SectionContext } from '../SettingsTab';
 
@@ -63,6 +64,7 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 	const swatch = createSpan({ cls: 'apm-swatch', attr: { style: `--apm-swatch-color:${shade}` } });
 	setIcon(swatch, projectIcon(role, project));
 	row.nameEl.prepend(swatch);
+	row.controlEl.prepend(moveButtons(role.projects, project, ctx));
 	row.settingEl.toggleClass('apm-hidden', project.hidden);
 
 	// Project-level lists, only when it has its own.

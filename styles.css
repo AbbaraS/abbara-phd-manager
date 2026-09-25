@@ -329,3 +329,23 @@
 	color: var(--text-muted);
 	font-size: var(--font-ui-small);
 }
+
+/* Sort button: pushed to the right end of the toolbar. */
+.apm-sort-button {
+	margin-left: auto;
+}
+
+/* Up/down buttons for roles (summary) and projects (row). */
+.apm-move {
+	display: inline-flex;
+	gap: var(--size-2-1);
+}
+
+.apm-role-summary > .apm-move {
+	margin-left: auto;
+}
+
+.apm-move button:disabled {
+	opacity: 0.3;
+	cursor: default;
+}

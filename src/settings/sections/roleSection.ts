@@ -1,6 +1,8 @@
 import { Setting, setIcon } from 'obsidian';
 import { Role } from '../../models/types';
-import { slugify, uniqueId } from '../../utils/ids';
+import { slugify } from '../../utils/ids';
+import { blankProject } from '../../models/newProject';
+import { moveButtons } from './moveButtons';
 import { renderProject } from './projectSection';
 import { renderOptionList } from './optionList';
 import type { SectionContext } from '../SettingsTab';
@@ -21,6 +23,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 	setIcon(summary.createSpan({ cls: 'apm-role-icon' }), role.icon);
 	summary.createSpan({ text: role.name || 'Untitled role' });
 	if (role.hidden) summary.createSpan({ cls: 'apm-hidden-tag', text: 'hidden' });
+	summary.append(moveButtons(roles, role, ctx));
 
 	// Basics.
 	new Setting(details).setName('Name').addText((t) => t.setValue(role.name).onChange((v) => {
@@ -61,8 +64,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 	details.createEl('h5', { text: 'Projects' });
 	role.projects.forEach((project) => renderProject(details, role, project, ctx));
 	new Setting(details).addButton((b) => b.setButtonText('Add project').onClick(() => {
-		const id = uniqueId('project', role.projects.map((p) => p.id));
-		role.projects.push({ id, name: 'New project', icon: '', color: '', hidden: false, deadline: '', types: [], statuses: [] });
+		role.projects.push(blankProject(role, 'New project'));
 		ctx.saveAndRedraw();
 	}));
 

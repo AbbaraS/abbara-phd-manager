@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: ManagerSettings = {
 	roles: cloneRoles(),
 	dailyNotesOnly: true,
 	carryOnEnter: true,
+	sortNewDailyNotes: true,
 	syncBadges: true,
 	managedBadgeKeys: [],
 };

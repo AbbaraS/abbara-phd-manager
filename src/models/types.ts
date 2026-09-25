@@ -39,6 +39,7 @@ export interface ManagerSettings {
 	roles: Role[];
 	dailyNotesOnly: boolean;     // show the toolbar only on daily notes
 	carryOnEnter: boolean;       // Enter on a badge task starts a new task with the same badges
+	sortNewDailyNotes: boolean;  // sort tasks in a new daily note (after Rollover adds them)
 	syncBadges: boolean;         // push role/project/type/status badges into Custom Badges
 	managedBadgeKeys: string[];  // badge keys this plugin created, so it can tidy them up
 }

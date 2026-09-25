@@ -5,6 +5,7 @@ import { buildBadgeIndex } from '../models/badgeIndex';
 import { readTask } from '../tasks/readTask';
 import { onEveryDocument } from './domEvents';
 import { showOptionMenu } from './optionMenu';
+import { showProjectMenu } from './projectMenu';
 
 // Menu entry per kind: title and icon.
 const ITEMS: [OptionKind, string, string][] = [
@@ -12,7 +13,7 @@ const ITEMS: [OptionKind, string, string][] = [
 	['status', 'Set task status', 'circle-dot'],
 ];
 
-// Right-click a task line to add or change its type / status (works when it has none yet).
+// Right-click a task line to change its project, or add/change its type / status.
 export function registerTaskContextMenu(plugin: Plugin, getRoles: () => Role[]): void {
 	// Where the right-click happened, so the follow-up menu opens there.
 	let at = { x: 0, y: 0 };
@@ -24,12 +25,18 @@ export function registerTaskContextMenu(plugin: Plugin, getRoles: () => Role[]):
 		const task = readTask(text, buildBadgeIndex(getRoles()));
 		if (!task) return;
 
+		const write = (t: string) => editor.setLine(lineNo, t);
+		// Defer so the right-click menu can close first.
+		const later = (show: () => void) => () => window.setTimeout(show, 0);
+
+		if (task.role.projects.some((p) => !p.hidden)) {
+			menu.addItem((i) => i.setTitle('Set project').setIcon('folder')
+				.onClick(later(() => showProjectMenu(at, text, getRoles(), write))));
+		}
 		for (const [kind, title, icon] of ITEMS) {
 			if (!optionsFor(kind, task.role, task.project).length) continue;
-			menu.addItem((i) => i.setTitle(title).setIcon(icon).onClick(() => {
-				// Defer so the right-click menu can close first.
-				window.setTimeout(() => showOptionMenu(at, kind, text, getRoles(), (t) => editor.setLine(lineNo, t)), 0);
-			}));
+			menu.addItem((i) => i.setTitle(title).setIcon(icon)
+				.onClick(later(() => showOptionMenu(at, kind, text, getRoles(), write))));
 		}
 	}));
 }

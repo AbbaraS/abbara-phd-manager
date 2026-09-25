@@ -50,6 +50,13 @@ export class SettingsTab extends PluginSettingTab {
 				ctx.save();
 			}));
 		new Setting(containerEl)
+			.setName('Sort new daily notes')
+			.setDesc('Order tasks by role, project, due date and created date when a daily note is created. Use the "Sort tasks in this note" command any time.')
+			.addToggle((t) => t.setValue(settings.sortNewDailyNotes).onChange((v) => {
+				settings.sortNewDailyNotes = v;
+				ctx.save();
+			}));
+		new Setting(containerEl)
 			.setName('Sync with Custom Badges')
 			.setDesc('Create a badge for every role, project, task type and status.')
 			.addToggle((t) => t.setValue(settings.syncBadges).onChange((v) => {
