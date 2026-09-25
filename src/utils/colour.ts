@@ -59,3 +59,13 @@ export function pastelOf(base: string, index: number, count: number): string {
 	const { h } = hexToHsl(base);
 	return hslToHex({ h: (h + ((index + 1) * 360) / (count + 1)) % 360, s: 65, l: 82 });
 }
+
+// "#abc", "#aabbcc", "r,g,b" or "rgb(r, g, b)" -> "#rrggbb"; '' for anything else (e.g. var(--…)).
+export function toHex(input: string): string {
+	const value = input.trim();
+	const hex = value.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+	if (hex) return rgbToHex(...hexToRgb(hex[1]));
+	const rgb = value.match(/^(?:rgb\()?\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)?$/);
+	const parts = rgb ? [rgb[1], rgb[2], rgb[3]].map(Number) : [];
+	return parts.length && parts.every((n) => n <= 255) ? rgbToHex(parts[0], parts[1], parts[2]) : '';
+}

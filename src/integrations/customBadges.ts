@@ -10,15 +10,19 @@ interface BadgeDefinition {
 	color: string;
 	placeholder: 'default';
 	placeholderText: string;
+	source: string; // our plugin id, so Custom Badges lists these under our name
 }
 
 // The bits of the Custom Badges plugin we use.
 interface CustomBadgesPlugin extends Plugin {
 	settings: { badges: BadgeDefinition[] };
 	saveSettings(): Promise<void>;
+	// Newer versions: replaces our badges but keeps styling the user set there (font size etc).
+	setPluginBadges?(pluginId: string, badges: Partial<BadgeDefinition>[]): Promise<string[]>;
 }
 
 const PLUGIN_ID = 'custom-badges';
+const PHD_MANAGER_ID = 'abbara-phd-manager';
 
 // Custom Badges plugin instance, or null if it is not installed/enabled.
 export function getCustomBadges(app: App): CustomBadgesPlugin | null {
@@ -30,7 +34,7 @@ export function getCustomBadges(app: App): CustomBadgesPlugin | null {
 
 // Build a badge definition with the fields Custom Badges expects.
 const badge = (key: string, label: string, icon: string, color: string): BadgeDefinition =>
-	({ key, label, icon, color, placeholder: 'default', placeholderText: '' });
+	({ key, label, icon, color, placeholder: 'default', placeholderText: '', source: PHD_MANAGER_ID });
 
 // Every badge the current roles need: one per role, project, type and status.
 // Hidden roles and projects are included, so tasks already in notes keep their badges.
@@ -62,6 +66,14 @@ export async function syncBadges(app: App, roles: Role[], previousKeys: string[]
 
 	const wanted = buildBadges(roles);
 	const wantedKeys = wanted.map((b) => b.key);
+
+	if (plugin.setPluginBadges) {
+		// Drop untagged copies left by older syncs, then send only the fields we own.
+		plugin.settings.badges = plugin.settings.badges.filter(
+			(b) => b.source || (!wantedKeys.includes(b.key) && !previousKeys.includes(b.key)),
+		);
+		return plugin.setPluginBadges(PHD_MANAGER_ID, wanted.map(({ key, label, icon, color }) => ({ key, label, icon, color })));
+	}
 
 	// Keep the user's own badges, drop stale managed ones, then add/replace ours.
 	const kept = plugin.settings.badges.filter(

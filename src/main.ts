@@ -9,6 +9,7 @@ import { registerCarryOnEnter } from './editor/carryOnEnter';
 import { registerBadgeClick } from './editor/badgeClick';
 import { registerTaskContextMenu } from './editor/taskContextMenu';
 import { buildBadgeIndex } from './models/badgeIndex';
+import { applyBadgeEdit, EditedBadge } from './models/applyBadgeEdit';
 import { TaskStore } from './progress/TaskStore';
 import { PROGRESS_BLOCK, ProgressBlock, parseFilter } from './progress/ProgressBlock';
 import { TaskSorter } from './sort/TaskSorter';
@@ -53,6 +54,13 @@ export default class ProjectManagerPlugin extends Plugin {
 			name: 'Sync badges with Custom Badges',
 			callback: () => this.pushBadges(true),
 		});
+	}
+
+	// Called by Custom Badges when one of our badges is edited in its settings.
+	async onCustomBadgeEdited(badge: EditedBadge): Promise<void> {
+		if (!applyBadgeEdit(this.settings.roles, badge)) return;
+		await this.saveSettings();
+		this.settingsTab.refreshIfOpen();
 	}
 
 	onunload(): void {
