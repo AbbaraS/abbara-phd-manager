@@ -1,6 +1,6 @@
 {
 	"name": "abbara-phd-manager",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"description": "Roles, projects and typed tasks for Obsidian, visualised with Custom Badges.",
 	"main": "main.js",
 	"scripts": {

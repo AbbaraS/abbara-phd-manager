@@ -1,7 +1,7 @@
 {
 	"id": "abbara-phd-manager",
 	"name": "Abbara PhD Manager",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"minAppVersion": "1.4.0",
 	"description": "Manage roles, projects and typed tasks from your daily notes, visualised with Custom Badges.",
 	"author": "AbbaraS",
