@@ -30,9 +30,8 @@ export class SettingsTab extends PluginSettingTab {
 
 		const ctx: SectionContext = {
 			save: () => plugin.requestSave(),
-			saveAndRedraw: async () => {
-				await plugin.saveSettings();
-				this.display();
+			saveAndRedraw: () => {
+				void plugin.saveSettings().then(() => this.display());
 			},
 			openSections: this.openSections,
 			renderBadge: (look) => renderBadge(plugin.app, look),

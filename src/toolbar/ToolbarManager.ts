@@ -85,10 +85,9 @@ export class ToolbarManager {
 
 	// "New project…": popup, save, then carry on picking the task's type.
 	private createProject: CreateProject = (role, then) => {
-		new NewProjectModal(this.plugin.app, role, async (project) => {
+		new NewProjectModal(this.plugin.app, role, (project) => {
 			role.projects.push(project);
-			await this.plugin.saveSettings();
-			then(project);
+			void this.plugin.saveSettings().then(() => then(project));
 		}).open();
 	};
 

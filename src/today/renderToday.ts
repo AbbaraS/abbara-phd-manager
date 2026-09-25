@@ -1,4 +1,5 @@
-import { setIcon, setTooltip } from 'obsidian';
+import { setIcon } from 'obsidian';
+import { tooltip } from '../utils/tooltip';
 import { setIconOrEmoji } from '../utils/icon';
 import { Tally, totalOf } from './countToday';
 
@@ -50,7 +51,7 @@ function renderSummary(panel: HTMLElement, spec: TodaySpec): void {
 	const eye = done.createEl('button', { cls: 'apm-today-eye clickable-icon' });
 	eye.toggleClass('is-active', spec.hideDone);
 	setIcon(eye, spec.hideDone ? 'eye-off' : 'eye');
-	setTooltip(eye, spec.hideDone ? 'Completed tasks are hidden. Click to show them.' : 'Hide completed tasks');
+	tooltip(eye, spec.hideDone ? 'Completed tasks are hidden. Click to show them.' : 'Hide completed tasks');
 	eye.addEventListener('click', spec.onToggleDone);
 
 	kpi(row, 'is-added', 'circle-plus', `+${overall.added}`, 'added');
@@ -66,7 +67,7 @@ function renderSummary(panel: HTMLElement, spec: TodaySpec): void {
 	const pin = row.createEl('button', { cls: 'apm-today-pin clickable-icon' });
 	pin.toggleClass('is-active', spec.pinned);
 	setIcon(pin, spec.pinned ? 'pin-off' : 'pin');
-	setTooltip(pin, spec.pinned ? 'Unpin: put the panel back in the note' : 'Pin to the top of the note');
+	tooltip(pin, spec.pinned ? 'Unpin: put the panel back in the note' : 'Pin to the top of the note');
 	pin.addEventListener('click', spec.onTogglePin);
 }
 
@@ -101,7 +102,7 @@ function renderRole(grid: HTMLElement, role: TodayRole, spec: TodaySpec): void {
 	bar.createDiv({ cls: 'apm-today-role-fill', attr: { style: `width:${pct(tally)}%` } });
 
 	const action = active && spec.filter.size === 1 ? 'Click to show all roles' : `Click to show only ${role.name}`;
-	setTooltip(chip, `${role.name}: ${tally.done} of ${totalOf(tally)} done, ${tally.added} added today, ${tally.open} to do. ${action}`);
+	tooltip(chip, `${role.name}: ${tally.done} of ${totalOf(tally)} done, ${tally.added} added today, ${tally.open} to do. ${action}`);
 	chip.addEventListener('click', () => spec.onRoleClick(role.id));
 }
 

@@ -1,5 +1,6 @@
 import { WidgetType } from '@codemirror/view';
-import { setIcon, setTooltip } from 'obsidian';
+import { setIcon } from 'obsidian';
+import { tooltip } from '../utils/tooltip';
 import { setIconOrEmoji } from '../utils/icon';
 
 // What a divider shows.
@@ -43,7 +44,7 @@ export class DividerWidget extends WidgetType {
 		// Chevron: fold the group away, or open it again.
 		const chevron = row.createEl('button', { cls: 'apm-divider-chevron clickable-icon' });
 		setIcon(chevron, look.collapsed ? 'chevron-right' : 'chevron-down');
-		setTooltip(chevron, look.collapsed ? `Expand ${look.name}` : `Collapse ${look.name}`);
+		tooltip(chevron, look.collapsed ? `Expand ${look.name}` : `Collapse ${look.name}`);
 		onClick(chevron, () => actions.onToggle(look.role));
 
 		// Label: click to show only this role (click again for all).
@@ -51,7 +52,7 @@ export class DividerWidget extends WidgetType {
 		label.toggleClass('is-active', look.active);
 		setIconOrEmoji(label.createSpan({ cls: 'apm-divider-icon' }), look.icon);
 		label.createSpan({ text: look.name });
-		setTooltip(label, look.active ? 'Show all roles' : `Show only ${look.name}`);
+		tooltip(label, look.active ? 'Show all roles' : `Show only ${look.name}`);
 		onClick(label, () => actions.onFilter(look.role));
 
 		row.createDiv({ cls: 'apm-divider-rule' });

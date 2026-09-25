@@ -1,4 +1,5 @@
-import { setIcon, setTooltip } from 'obsidian';
+import { setIcon } from 'obsidian';
+import { tooltip } from '../utils/tooltip';
 import { Role } from '../models/types';
 import { setIconOrEmoji } from '../utils/icon';
 
@@ -43,10 +44,10 @@ export function renderToolbar(spec: ToolbarSpec): HTMLElement {
 }
 
 // Small icon button, highlighted when `active`.
-function iconButton(parent: HTMLElement, icon: string, tooltip: string, active: boolean): HTMLElement {
+function iconButton(parent: HTMLElement, icon: string, hint: string, active: boolean): HTMLElement {
 	const button = parent.createEl('button', { cls: 'apm-tool-button clickable-icon' });
 	button.toggleClass('is-active', active);
 	setIcon(button, icon);
-	setTooltip(button, tooltip);
+	tooltip(button, hint);
 	return button;
 }
