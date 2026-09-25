@@ -5,6 +5,7 @@ import { renderRole } from './sections/roleSection';
 import { renderRolesFileInfo } from './sections/rolesFileInfo';
 import { slugify, uniqueId } from '../utils/ids';
 import { BadgeLook, renderBadge } from '../integrations/customBadges';
+import { DoneBadgeLook } from '../models/types';
 
 // Shared helpers passed to every settings section.
 export interface SectionContext {
@@ -59,6 +60,30 @@ export class SettingsTab extends PluginSettingTab {
 				settings.sortNewDailyNotes = v;
 				ctx.save();
 			}));
+		new Setting(containerEl)
+			.setName('Add new tasks in order')
+			.setDesc('Toolbar tasks go straight to their role and project spot in the task list, instead of at the cursor.')
+			.addToggle((t) => t.setValue(settings.insertInOrder).onChange((v) => {
+				settings.insertInOrder = v;
+				ctx.save();
+			}));
+		new Setting(containerEl)
+			.setName('Role dividers')
+			.setDesc('Draw a role label above each role\'s group of tasks (not saved in the note). Click a label to show only that role.')
+			.addToggle((t) => t.setValue(settings.roleDividers).onChange((v) => {
+				settings.roleDividers = v;
+				ctx.save();
+			}));
+		new Setting(containerEl)
+			.setName('Badges on completed tasks')
+			.setDesc('How badges look once a task is ticked or cancelled.')
+			.addDropdown((d) => d
+				.addOptions({ 'grey-strike': 'Grey + strikethrough', grey: 'Grey', strike: 'Strikethrough', none: 'Unchanged' })
+				.setValue(settings.doneBadgeLook)
+				.onChange((v) => {
+					settings.doneBadgeLook = v as DoneBadgeLook;
+					ctx.save();
+				}));
 		new Setting(containerEl)
 			.setName('Sync with Custom Badges')
 			.setDesc('Create a badge for every role, project, task type and status.')

@@ -36,6 +36,30 @@ It runs automatically when a new daily note is created (after Rollover adds yest
 - Click a role/project badge on a task (or right-click → *Set project*) to move it to another project of that role. Its type and status carry over when the new project has one with the same id.
 - Click a type or status badge (or right-click → *Set task type / status*) to change it.
 
+## Daily note view
+
+Add both blocks to your daily template, above the task list:
+
+````md
+```apm-progress
+```
+
+```apm-today
+```
+````
+
+- **Today panel** (`apm-today`): two lines. Line 1 = tasks done / on today's list, tasks added today, tasks still open, and a progress bar. Line 2 = one chip per role with its own done/total, `+n` added today and a thin bar. Hover a chip for the full numbers.
+  - *Added today* = the task's `➕` date, else the first daily note it appears in, is this note's day. Rolled-over tasks don't count as added.
+  - Cancelled tasks (`[-]`) are left out of every count.
+- **Hide completed**: the eye button (toolbar, or next to *done* in the Today panel) hides ticked and cancelled tasks, with their subtasks. It's remembered across restarts. Command: *Hide / show completed tasks*.
+- **Filter by role**: click a role chip in the Today panel or a role divider to show only that role (click again for all). The filter button in the toolbar lets you tick several roles. The filter resets when Obsidian restarts. Command: *Show tasks from all roles*.
+- The line you're typing on always stays visible, so a new task never vanishes while you write it.
+- **Role dividers**: a role label with done/total is drawn above each role's group of tasks. It's not saved in the note, so Rollover and sorting keep working. Only lists with two or more roles get dividers.
+- **Add new tasks in order**: a task added from the toolbar goes straight to the end of its role → project group (in the list the cursor is in, else the biggest task list), not at the cursor. Turn off in settings to insert at the cursor again.
+- **Badges on completed tasks**: grey + strikethrough by default (settings: grey, strikethrough, both or unchanged).
+
+Hiding and dividers work in live preview and source mode. Reading view only hides completed tasks.
+
 ## Folder structure
 
 ```
@@ -66,10 +90,23 @@ src/
     NewProjectModal.ts             "New project…" popup
   editor/
     carryOnEnter.ts                Enter on a badge task → new task with the same badges
+  filter/
+    TaskFilter.ts                  hide-completed + role filter state, commands
+    taskListField.ts               editor extension: hides lines, draws dividers
+    planTaskList.ts                which lines to hide, where dividers go (pure)
+    DividerWidget.ts               the role label drawn above a group
+    filterMenu.ts                  toolbar filter menu
+  today/
+    TodayBlock.ts                  ```apm-today``` block
+    countToday.ts                  done / added / open counts (pure)
+    renderToday.ts                 draws the two-line panel
+  display/
+    doneBadgeLook.ts               grey / struck badges on ticked tasks (body classes)
   tasks/
     taskLine.ts                    builds the "- [ ] badges" line
     nextTaskLine.ts                works out that next line (pure)
     insertTask.ts                  puts the line in the editor
+    orderedSpot.ts                 where a new task goes to keep groups together (pure)
   sort/
     TaskSorter.ts                  command + auto-sort of new daily notes
     sortLines.ts                   reorders list blocks (pure)
@@ -80,6 +117,7 @@ src/
     colour.ts                      hex/HSL helpers and shade generator
     dailyNotes.ts                  "is this a daily note?"
     ids.ts                         slugs and unique ids
+    editorView.ts                  reaches the CodeMirror view behind Obsidian's Editor
 styles.css                         toolbar + settings styles
 ```
 
@@ -139,7 +177,8 @@ Test vault: `myPluginTestVault/.obsidian/plugins/abbara-phd-manager` is a symlin
 ## Ideas for later
 
 - "New task" command + hotkey (same flow as the toolbar, via a modal)
-- Insert under a chosen heading (e.g. `### To-do List:`) instead of at the cursor
 - Dashboard view: open tasks grouped by role/project
+- Collapse a role group by clicking its divider chevron
+- Role filter in reading view
 - Due dates, priorities, status
 - Confirm before "Reset to defaults"

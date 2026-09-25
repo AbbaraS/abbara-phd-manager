@@ -35,12 +35,19 @@ export interface Role {
 	statuses: TaskStatus[]; // default task statuses for every project in this role
 }
 
+// How badges look on ticked or cancelled tasks.
+export type DoneBadgeLook = 'grey-strike' | 'grey' | 'strike' | 'none';
+
 // Everything the plugin saves to data.json.
 export interface ManagerSettings {
 	roles: Role[];
 	dailyNotesOnly: boolean;     // show the toolbar only on daily notes
 	carryOnEnter: boolean;       // Enter on a badge task starts a new task with the same badges
 	sortNewDailyNotes: boolean;  // sort tasks in a new daily note (after Rollover adds them)
+	insertInOrder: boolean;      // toolbar puts a new task at its role/project spot, not at the cursor
+	roleDividers: boolean;       // draw a role label above each role's group of tasks
+	hideCompleted: boolean;      // hide ticked and cancelled tasks (toolbar eye button)
+	doneBadgeLook: DoneBadgeLook; // badges on ticked tasks: grey, struck through, both or unchanged
 	syncBadges: boolean;         // push role/project/type/status badges into Custom Badges
 	managedBadgeKeys: string[];  // badge keys this plugin created, so it can tidy them up
 }

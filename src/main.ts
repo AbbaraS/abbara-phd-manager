@@ -13,15 +13,20 @@ import { applyBadgeEdit, EditedBadge } from './models/applyBadgeEdit';
 import { TaskStore } from './progress/TaskStore';
 import { PROGRESS_BLOCK, ProgressBlock, parseFilter } from './progress/ProgressBlock';
 import { TaskSorter } from './sort/TaskSorter';
+import { TaskFilter } from './filter/TaskFilter';
+import { TODAY_BLOCK, TodayBlock } from './today/TodayBlock';
+import { DoneBadgeLookManager } from './display/doneBadgeLook';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
 export default class ProjectManagerPlugin extends Plugin {
 	settings!: ManagerSettings;
 	tasks = new TaskStore(this);
+	filter = new TaskFilter(this);
 	rolesFile = new RolesFile(this, (roles) => void this.onRolesFileEdited(roles));
 	private toolbar = new ToolbarManager(this);
 	sorter = new TaskSorter(this);
 	private settingsTab = new SettingsTab(this.app, this);
+	private doneLook = new DoneBadgeLookManager(this, () => this.settings.doneBadgeLook);
 
 	// Save shortly after the user stops typing.
 	requestSave = debounce(() => this.saveSettings(), 600, true);
@@ -37,10 +42,18 @@ export default class ProjectManagerPlugin extends Plugin {
 		registerBadgeClick(this, roles);
 		registerTaskContextMenu(this, roles);
 
+		// Grey/struck badges on ticked tasks; hide completed + role filter + role dividers.
+		this.doneLook.register();
+		this.filter.register();
+
 		// Deadline dashboard, kept live by the task index.
 		this.tasks.register();
 		this.registerMarkdownCodeBlockProcessor(PROGRESS_BLOCK, (source, el, ctx) =>
 			ctx.addChild(new ProgressBlock(el, this, parseFilter(source))),
+		);
+		// Today panel: done / added / open for this daily note.
+		this.registerMarkdownCodeBlockProcessor(TODAY_BLOCK, (_source, el, ctx) =>
+			ctx.addChild(new TodayBlock(el, this, ctx.sourcePath)),
 		);
 
 		// Task order: command + auto-sort of new daily notes.
@@ -65,6 +78,7 @@ export default class ProjectManagerPlugin extends Plugin {
 
 	onunload(): void {
 		this.toolbar.removeAll();
+		this.doneLook.clear();
 	}
 
 	// Load options from data.json and roles from roles-projects-themes.json.
@@ -89,10 +103,12 @@ export default class ProjectManagerPlugin extends Plugin {
 		await this.pushBadges(false);
 		this.toolbar.refresh();
 		this.tasks.changed();
+		this.filter.rolesChanged();
+		this.doneLook.apply();
 	}
 
 	// Save everything except roles to data.json.
-	private async saveOptions(): Promise<void> {
+	async saveOptions(): Promise<void> {
 		const options: Partial<ManagerSettings> = { ...this.settings };
 		delete options.roles;
 		await this.saveData(options);
@@ -105,6 +121,7 @@ export default class ProjectManagerPlugin extends Plugin {
 			await this.pushBadges(false);
 			this.toolbar.refresh();
 			this.tasks.changed();
+			this.filter.rolesChanged();
 		}
 		this.settingsTab.refreshIfOpen();
 	}

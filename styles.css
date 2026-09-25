@@ -398,9 +398,37 @@ details[open] > .apm-section-summary {
 	font-size: var(--font-ui-small);
 }
 
-/* Sort button: pushed to the right end of the toolbar. */
-.apm-sort-button {
+/* Eye, filter and sort buttons: pushed to the right end of the toolbar. */
+.apm-toolbar-tools {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
 	margin-left: auto;
+}
+
+.apm-tool-button {
+	position: relative;
+}
+
+/* On: completed tasks hidden, or a role filter is set. */
+.apm-tool-button.is-active {
+	color: var(--interactive-accent);
+	background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+}
+
+/* Number of roles in the filter, tucked into the button's corner. */
+.apm-tool-count {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 13px;
+	padding: 0 3px;
+	border-radius: 999px;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: 9px;
+	font-weight: var(--font-bold);
+	line-height: 13px;
 }
 
 /* Up/down buttons on each section's summary line. */
@@ -426,4 +454,326 @@ details[open] > .apm-section-summary {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/* ---------- Completed tasks ---------- */
+
+/*
+	Badges are inline-flex boxes, so the note's strikethrough on a ticked task never reaches them.
+	Live preview / source mode put data-task on the line; reading view puts it on the <li>.
+	Body classes come from the "Badges on completed tasks" setting.
+*/
+.apm-done-grey :is(.HyperMD-task-line[data-task="x"], .HyperMD-task-line[data-task="X"], .HyperMD-task-line[data-task="-"]) .inline-badge,
+.apm-done-grey :is(li[data-task="x"], li[data-task="X"], li[data-task="-"]) > :is(.inline-badge, p > .inline-badge) {
+	filter: grayscale(1);
+	opacity: 0.5;
+}
+
+.apm-done-strike :is(.HyperMD-task-line[data-task="x"], .HyperMD-task-line[data-task="X"], .HyperMD-task-line[data-task="-"]) .inline-badge :is(.inline-badge-title-inner, .inline-badge-divider),
+.apm-done-strike :is(li[data-task="x"], li[data-task="X"], li[data-task="-"]) > :is(.inline-badge, p > .inline-badge) :is(.inline-badge-title-inner, .inline-badge-divider) {
+	text-decoration: line-through;
+}
+
+/* Reading view: "Hide completed" (live preview is handled by the editor extension). */
+.apm-hide-done .markdown-reading-view li:is([data-task="x"], [data-task="X"], [data-task="-"]) {
+	display: none;
+}
+
+/* ---------- Role dividers (drawn between tasks, not saved in the note) ---------- */
+
+.apm-divider {
+	padding: var(--size-4-2) 0 2px;
+	user-select: none;
+}
+
+/* Pill, line, count on one row. */
+.apm-divider-row {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Role pill: click to show only this role. */
+.apm-divider-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	height: auto;
+	padding: 1px var(--size-4-2);
+	border: none;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--apm-role-color) 16%, transparent);
+	box-shadow: none;
+	color: var(--text-normal);
+	font-size: inherit;
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+}
+
+.apm-divider-label:hover {
+	background: color-mix(in srgb, var(--apm-role-color) 28%, transparent);
+}
+
+.apm-divider-label.is-active {
+	box-shadow: inset 0 0 0 1px var(--apm-role-color);
+}
+
+.apm-divider-icon {
+	display: inline-flex;
+	color: var(--apm-role-color);
+}
+
+.apm-divider-icon svg {
+	width: 12px;
+	height: 12px;
+}
+
+/* Thin line in the role colour, filling the row. */
+.apm-divider-rule {
+	flex: 1;
+	height: 1px;
+	background: color-mix(in srgb, var(--apm-role-color) 35%, var(--background-modifier-border));
+}
+
+/* ---------- Today panel (```apm-today``` block) ---------- */
+
+/* Two lines: summary, then role chips. */
+.apm-today {
+	container-type: inline-size;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	margin: var(--size-4-1) 0 var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-l);
+	background: var(--background-secondary);
+	font-size: var(--font-ui-small);
+	line-height: 1.2;
+}
+
+.apm-today-empty {
+	color: var(--text-muted);
+}
+
+/* Line 1. */
+.apm-today-summary {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-4);
+	min-width: 0;
+	white-space: nowrap;
+}
+
+.apm-today-title {
+	font-weight: var(--font-bold);
+	font-size: var(--font-ui-medium);
+}
+
+/* One number: icon, value, "/total", word. */
+.apm-today-kpi {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: var(--text-muted);
+}
+
+.apm-today-kpi-icon {
+	display: inline-flex;
+}
+
+.apm-today-kpi-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.apm-today-kpi.is-done .apm-today-kpi-icon {
+	color: var(--color-green);
+}
+
+.apm-today-kpi.is-added .apm-today-kpi-icon {
+	color: var(--color-blue);
+}
+
+.apm-today-value {
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+	font-size: var(--font-ui-medium);
+}
+
+.apm-today-of {
+	margin-left: -3px;
+	color: var(--text-muted);
+}
+
+/* Hide/show completed, right next to the done count. */
+.apm-today-eye {
+	height: auto;
+	padding: 2px;
+}
+
+.apm-today-eye svg {
+	width: 14px;
+	height: 14px;
+}
+
+.apm-today-eye.is-active {
+	color: var(--interactive-accent);
+}
+
+/* Overall bar: takes the rest of the line. */
+.apm-today-meter {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-width: 60px;
+}
+
+.apm-today-bar {
+	flex: 1;
+	height: 6px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--color-green) 18%, transparent);
+	overflow: hidden;
+}
+
+.apm-today-fill {
+	height: 100%;
+	border-radius: inherit;
+	background: var(--color-green);
+	transition: width 300ms ease;
+}
+
+.apm-today-pct {
+	min-width: 4ch;
+	text-align: right;
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Line 2: one equal-width chip per role, always a single row. */
+.apm-today-roles {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(0, 1fr);
+	gap: var(--size-4-2);
+}
+
+.apm-today-role {
+	position: relative;
+	display: block;
+	height: auto;
+	padding: 5px var(--size-4-2) 7px;
+	border: 1px solid color-mix(in srgb, var(--apm-role-color) 35%, var(--background-modifier-border));
+	border-radius: var(--radius-m);
+	background: color-mix(in srgb, var(--apm-role-color) 10%, var(--background-primary));
+	box-shadow: none;
+	overflow: hidden;
+	color: var(--text-normal);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal);
+	text-align: left;
+	cursor: pointer;
+	transition: opacity 150ms ease;
+}
+
+.apm-today-role:hover {
+	background: color-mix(in srgb, var(--apm-role-color) 18%, var(--background-primary));
+}
+
+/* Filtered to this role / to another role. */
+.apm-today-role.is-active {
+	border-color: var(--apm-role-color);
+	box-shadow: inset 0 0 0 1px var(--apm-role-color);
+}
+
+.apm-today-role.is-dimmed {
+	opacity: 0.45;
+}
+
+.apm-today-role-top {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	min-width: 0;
+}
+
+.apm-today-role-icon {
+	display: inline-flex;
+	flex: none;
+	color: var(--apm-role-color);
+}
+
+.apm-today-role-icon svg {
+	width: 13px;
+	height: 13px;
+}
+
+.apm-today-role-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: var(--font-medium);
+}
+
+.apm-today-role-count {
+	flex: none;
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.apm-today-role-count .apm-today-value {
+	font-size: inherit;
+}
+
+/* "+2" = added today. */
+.apm-today-role-added {
+	flex: none;
+	padding: 0 5px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--apm-role-color) 24%, transparent);
+	color: var(--text-normal);
+	font-size: 0.9em;
+	font-weight: var(--font-medium);
+}
+
+/* Thin progress line along the chip's bottom edge. */
+.apm-today-role-bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+	background: color-mix(in srgb, var(--apm-role-color) 20%, transparent);
+}
+
+.apm-today-role-fill {
+	height: 100%;
+	background: var(--apm-role-color);
+	transition: width 300ms ease;
+}
+
+/* Narrow panes: drop the words, keep the numbers. */
+@container (max-width: 520px) {
+	.apm-today-label,
+	.apm-today-pct {
+		display: none;
+	}
+	.apm-today-summary {
+		gap: var(--size-4-3);
+	}
+}
+
+@container (max-width: 420px) {
+	.apm-today-role-name {
+		display: none;
+	}
 }

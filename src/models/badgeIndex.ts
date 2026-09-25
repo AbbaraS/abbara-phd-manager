@@ -25,3 +25,12 @@ export function buildBadgeIndex(roles: Role[]): Map<string, BadgeEntry> {
 	}
 	return index;
 }
+
+// Role id of a task from its badge keys: the first role or project badge of ours (undefined = none).
+export function roleIdOf(keys: string[], index: Map<string, BadgeEntry>): string | undefined {
+	for (const key of keys) {
+		const entry = index.get(key);
+		if (entry?.kind === 'role' || entry?.kind === 'project') return entry.role.id;
+	}
+	return undefined;
+}

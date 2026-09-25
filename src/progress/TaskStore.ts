@@ -1,6 +1,6 @@
 import { Events, Plugin, TAbstractFile, TFile, debounce, moment } from 'obsidian';
 import { BadgeEntry } from '../models/badgeIndex';
-import { scanTasks } from './scanTasks';
+import { TaskRecord, scanTasks } from './scanTasks';
 import { NoteTasks, Progress, countProgress } from './countProgress';
 import { firstSeenDates } from '../sort/firstSeen';
 import { dailyNoteDate } from '../utils/dailyNotes';
@@ -36,6 +36,11 @@ export class TaskStore extends Events {
 	// Done / total per project badge key.
 	progress(index: Map<string, BadgeEntry>): Map<string, Progress> {
 		return countProgress(this.notes.values(), index);
+	}
+
+	// Badge tasks in one note ([] if none).
+	tasksIn(path: string): TaskRecord[] {
+		return this.notes.get(path)?.tasks ?? [];
 	}
 
 	// Day each task was first written down, by copy key (see sort/firstSeen.ts).

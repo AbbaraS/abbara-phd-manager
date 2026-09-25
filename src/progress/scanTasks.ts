@@ -1,4 +1,5 @@
 import { badgeKeys, taskIdOf } from '../tasks/taskBadges';
+import { createdDateOf } from '../tasks/taskDates';
 
 // One badge task as found in a note.
 export interface TaskRecord {
@@ -6,6 +7,7 @@ export interface TaskRecord {
 	id?: string;    // task id, shared by rolled-over copies
 	text: string;   // task text without badges, lower case (used to match copies with no id)
 	mark: string;   // checkbox character: ' ', 'x', '-', ...
+	created?: string; // "YYYY-MM-DD" from a ➕ date on the line
 }
 
 const TASK = /^\s*[-*+] \[(.)\] (.*)$/;
@@ -20,7 +22,7 @@ export function scanTasks(text: string): TaskRecord[] {
 		const keys = match ? badgeKeys(line) : [];
 		if (!match || !keys.length) continue;
 		const plain = match[2].replace(ANY_BADGE, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-		out.push({ keys, id: taskIdOf(line), text: plain, mark: match[1] });
+		out.push({ keys, id: taskIdOf(line), text: plain, mark: match[1], created: createdDateOf(line) });
 	}
 	return out;
 }

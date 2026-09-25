@@ -75,7 +75,7 @@ export class TaskSorter {
 	}
 
 	// Key function using the current roles and the day each task was first written down.
-	private keyMaker(): (line: string) => SortKey {
+	keyMaker(): (line: string) => SortKey {
 		const roles = this.plugin.settings.roles;
 		const index = buildBadgeIndex(roles);
 		const firstSeen = this.plugin.tasks.firstSeen();

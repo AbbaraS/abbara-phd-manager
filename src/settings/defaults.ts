@@ -10,6 +10,10 @@ export const DEFAULT_SETTINGS: ManagerSettings = {
 	dailyNotesOnly: true,
 	carryOnEnter: true,
 	sortNewDailyNotes: true,
+	insertInOrder: true,
+	roleDividers: true,
+	hideCompleted: false,
+	doneBadgeLook: 'grey-strike',
 	syncBadges: true,
 	managedBadgeKeys: [],
 };

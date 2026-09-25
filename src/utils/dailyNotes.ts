@@ -32,3 +32,7 @@ export function dailyNoteDate(app: App, file: TFile | null): string | null {
 
 // True if `file` sits where a daily note would, with a name matching the date format.
 export const isDailyNote = (app: App, file: TFile | null) => dailyNoteDate(app, file) !== null;
+
+// Notes the plugin's toolbar, filter and dividers work on: daily notes, or every note if `dailyOnly` is off.
+export const isManagedNote = (app: App, file: TFile | null, dailyOnly: boolean) =>
+	!!file && (!dailyOnly || isDailyNote(app, file));
