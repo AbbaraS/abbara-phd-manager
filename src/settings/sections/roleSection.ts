@@ -57,6 +57,13 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 			role.color = v;
 			ctx.saveAndRedraw();
 		}));
+	new Setting(details)
+		.setName('Role icon on project badges')
+		.setDesc('Project badges start with this role\'s icon and name, then "|", then the project\'s icon and name.')
+		.addToggle((t) => t.setValue(!!role.roleOnProjects).onChange((v) => {
+			role.roleOnProjects = v;
+			ctx.saveAndRedraw(); // redraw so project previews update
+		}));
 
 	// == Projects.
 	details.createEl('h5', { text: 'Projects' });

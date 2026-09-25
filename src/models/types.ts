@@ -29,6 +29,7 @@ export interface Role {
 	icon: string;           // Lucide icon name for the badge and toolbar
 	color: string;          // theme colour, projects are shades of it
 	hidden: boolean;        // true = left out of the toolbar, badges still kept
+	roleOnProjects?: boolean; // true = project badges start with this role's icon and name, e.g. "🫀 PhD | 📗 Report"
 	projects: Project[];
 	types: TaskType[];      // default task types for every project in this role
 	statuses: TaskStatus[]; // default task statuses for every project in this role

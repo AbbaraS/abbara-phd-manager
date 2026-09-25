@@ -1,12 +1,15 @@
 import { App, Plugin } from 'obsidian';
 import { Project, Role, TaskOption } from '../models/types';
-import { OptionKind, optionBadgeColor, optionKey, projectColor, projectIcon, projectKey, roleKey } from '../models/resolve';
+import { OptionKind, optionBadgeColor, optionKey, projectColor, projectKey, roleKey } from '../models/resolve';
+import { projectBadgeText } from '../models/projectBadge';
 
 // Shape of one badge in the Custom Badges plugin's settings.
 interface BadgeDefinition {
 	key: string;
 	label: string;
 	icon: string;
+	prefixIcon: string;  // shown before a "|" divider (Custom Badges 1.4+); empty = none
+	prefixLabel: string;
 	color: string;
 	placeholder: 'default';
 	placeholderText: string;
@@ -35,8 +38,8 @@ export function getCustomBadges(app: App): CustomBadgesPlugin | null {
 }
 
 // Build a badge definition with the fields Custom Badges expects.
-const badge = (key: string, label: string, icon: string, color: string): BadgeDefinition =>
-	({ key, label, icon, color, placeholder: 'default', placeholderText: '', source: PHD_MANAGER_ID });
+const badge = (key: string, label: string, icon: string, color: string, prefixIcon = '', prefixLabel = ''): BadgeDefinition =>
+	({ key, label, icon, prefixIcon, prefixLabel, color, placeholder: 'default', placeholderText: '', source: PHD_MANAGER_ID });
 
 // Every badge the current roles need: one per role, project, type and status.
 // Hidden roles and projects are included, so tasks already in notes keep their badges.
@@ -52,7 +55,8 @@ export function buildBadges(roles: Role[]): BadgeDefinition[] {
 		addOptions('status', role, role.statuses, role.color);
 		for (const project of role.projects) {
 			const shade = projectColor(role, project);
-			out.push(badge(projectKey(role, project), `${role.name} | ${project.name}`, projectIcon(role, project), shade));
+			const t = projectBadgeText(role, project);
+			out.push(badge(projectKey(role, project), t.label, t.icon, shade, t.prefixIcon, t.prefixLabel));
 			addOptions('type', role, project.types, shade, project);
 			addOptions('status', role, project.statuses, shade, project);
 		}
@@ -74,7 +78,7 @@ export async function syncBadges(app: App, roles: Role[], previousKeys: string[]
 		plugin.settings.badges = plugin.settings.badges.filter(
 			(b) => b.source || (!wantedKeys.includes(b.key) && !previousKeys.includes(b.key)),
 		);
-		return plugin.setPluginBadges(PHD_MANAGER_ID, wanted.map(({ key, label, icon, color }) => ({ key, label, icon, color })));
+		return plugin.setPluginBadges(PHD_MANAGER_ID, wanted.map(({ key, label, icon, prefixIcon, prefixLabel, color }) => ({ key, label, icon, prefixIcon, prefixLabel, color })));
 	}
 
 	// Keep the user's own badges, drop stale managed ones, then add/replace ours.
@@ -87,7 +91,9 @@ export async function syncBadges(app: App, roles: Role[], previousKeys: string[]
 }
 
 // The fields we can preview live in settings.
-export type BadgeLook = Pick<BadgeDefinition, 'key' | 'label' | 'icon' | 'color'>;
+// Prefix fields are optional: left out = keep what's saved.
+export type BadgeLook = Pick<BadgeDefinition, 'key' | 'label' | 'icon' | 'color'>
+	& Partial<Pick<BadgeDefinition, 'prefixIcon' | 'prefixLabel'>>;
 
 // A badge exactly as it will look in a note, or null when Custom Badges can't draw one.
 export function renderBadge(app: App, look: BadgeLook): HTMLElement | null {

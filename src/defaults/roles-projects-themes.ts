@@ -11,7 +11,7 @@ const project = (id: string, name: string, icon = ''): Project =>
 	({ id, name, icon, color: '', hidden: false, deadline: '', types: [], statuses: [] });
 
 export const DEFAULT_ROLES: Role[] = [
-	{
+	{ // == PhD role ==
 		id: 'phd', name: 'PhD', icon: 'book-heart', color: '#C62525', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('tts-3d', 'TTS 3D', 'box'),
@@ -24,7 +24,7 @@ export const DEFAULT_ROLES: Role[] = [
 			type('email', 'Email', 'mail'),
 		],
 	},
-	{
+	{ // == ResLife role ==
 		id: 'reslife', name: 'ResLife', icon: 'handshake', color: '#339933', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('schedule', 'Schedule'),
@@ -34,7 +34,7 @@ export const DEFAULT_ROLES: Role[] = [
 			type('shiftswap', 'Shift swap', 'calendar-clock'),
 		],
 	},
-	{
+	{ // == Obsidian role ==
 		id: 'obsidian', name: 'Obsidian', icon: 'obsidian-new', color: '#CACACA', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('custom-badges', 'custom-badges'),
@@ -46,7 +46,7 @@ export const DEFAULT_ROLES: Role[] = [
 			type('docs', 'Docs', 'file-text'),
 		],
 	},
-	{
+	{ // == VS Code role ==
 		id: 'vscode', name: 'VS Code', icon: 'code-xml', color: '#4F6BED', hidden: false, statuses: starterStatuses(),
 		projects: [
 			project('abbara-theme', 'Abbara theme'),

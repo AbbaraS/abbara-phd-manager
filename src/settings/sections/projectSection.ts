@@ -1,6 +1,7 @@
 import { Setting } from 'obsidian';
 import { Project, Role } from '../../models/types';
-import { projectColor, projectIcon, projectKey } from '../../models/resolve';
+import { projectColor, projectKey } from '../../models/resolve';
+import { projectBadgeText } from '../../models/projectBadge';
 import { daysUntil } from '../../utils/dates';
 import type { SectionContext } from '../SettingsTab';
 import { collapsible } from './collapsible';
@@ -24,8 +25,7 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 	const refreshTitle = () => {
 		drawTitle({
 			key: projectKey(role, project),
-			label: `${role.name} | ${project.name}`, // same label the synced badge gets
-			icon: projectIcon(role, project),
+			...projectBadgeText(role, project), // same text the synced badge gets
 			color: projectColor(role, project),
 			name: project.name || 'Untitled project',
 		});
