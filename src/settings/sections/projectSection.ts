@@ -1,87 +1,115 @@
 import { Setting } from 'obsidian';
 import { Project, Role } from '../../models/types';
-import { projectColor, projectIcon } from '../../models/resolve';
-import { renderOptionList } from './optionList';
-import { moveButtons } from './moveButtons';
+import { projectColor, projectIcon, projectKey } from '../../models/resolve';
 import { daysUntil } from '../../utils/dates';
 import type { SectionContext } from '../SettingsTab';
-import { setIconOrEmoji } from '../../utils/icon';
+import { collapsible } from './collapsible';
+import { sectionTitle } from './sectionTitle';
+import { iconField } from './iconField';
+import { moveButtons } from './moveButtons';
+import { renderOptionList } from './optionList';
+import { visibilityButton } from './visibilityButton';
 
-// One project row, plus its own types/statuses when it overrides the role's.
+// Collapsible block for one project, plus its own types/statuses when it overrides the role's.
 export function renderProject(el: HTMLElement, role: Role, project: Project, ctx: SectionContext): void {
 	const shade = projectColor(role, project);
-	const index = role.projects.indexOf(project);
+	const owner = `${role.id}/${project.id}`;
+	const { details, summary } = collapsible(el, `project:${owner}`, 'apm-project', ctx);
+	details.style.setProperty('--apm-swatch-color', shade);
+	details.toggleClass('apm-hidden', project.hidden);
 
-	const row = new Setting(el)
-		.setClass('apm-project-row')
-		.setName(project.name || 'Untitled project')
-		.setDesc(`Badge key: ${role.id}-${project.id}${dueText(project.deadline)}`)
-		.addText((t) => t.setPlaceholder('Name').setValue(project.name).onChange((v) => {
+	// Summary line: the project badge as notes show it, due date, then show/hide and move buttons.
+	const drawTitle = sectionTitle(summary, 'apm-swatch', ctx);
+	const due = summary.createSpan({ cls: 'apm-section-meta' });
+	const refreshTitle = () => {
+		drawTitle({
+			key: projectKey(role, project),
+			label: `${role.name} | ${project.name}`, // same label the synced badge gets
+			icon: projectIcon(role, project),
+			color: projectColor(role, project),
+			name: project.name || 'Untitled project',
+		});
+		due.setText(dueText(project.deadline));
+	};
+	refreshTitle();
+	if (project.hidden) summary.createSpan({ cls: 'apm-hidden-tag', text: 'hidden' });
+	const actions = summary.createDiv({ cls: 'apm-summary-actions' });
+	actions.append(visibilityButton(project.hidden, () => {
+		project.hidden = !project.hidden;
+		ctx.saveAndRedraw();
+	}));
+	actions.append(moveButtons(role.projects, project, ctx));
+
+	// Basics.
+	new Setting(details)
+		.setName('Name')
+		.setDesc(`Badge key: ${role.id}-${project.id}`)
+		.addText((t) => t.setValue(project.name).onChange((v) => {
 			project.name = v;
+			refreshTitle();
 			ctx.save();
-		}))
-		.addText((t) => t.setPlaceholder(`Icon or emoji (${role.icon})`).setValue(project.icon).onChange((v) => {
-			project.icon = v.trim();
-			ctx.save();
-		}))
+		}));
+	iconField(details, 'Lucide icon name or an emoji. Empty = the role icon.', project.icon, role.icon, (icon) => {
+		project.icon = icon;
+		refreshTitle();
+		ctx.save();
+	});
+	new Setting(details)
+		.setName('Deadline')
+		.setDesc('Optional. Shows a card in the progress block.')
 		.addText((t) => {
 			t.inputEl.type = 'date';
-			t.inputEl.title = 'Deadline (optional)';
 			t.setValue(project.deadline).onChange((v) => {
 				project.deadline = v;
+				refreshTitle();
 				ctx.save();
 			});
-		})
+		});
+	new Setting(details)
+		.setName('Colour')
+		.setDesc(project.color ? 'Custom colour.' : 'Auto shade of the role colour.')
 		.addColorPicker((c) => c.setValue(shade).onChange((v) => {
 			project.color = v;
+			details.style.setProperty('--apm-swatch-color', v);
+			refreshTitle();
 			ctx.save();
 		}))
 		.addExtraButton((b) => b.setIcon('rotate-ccw').setTooltip('Use auto shade').onClick(() => {
 			project.color = '';
 			ctx.saveAndRedraw();
-		}))
-		.addToggle((t) => t.setTooltip('Own task types').setValue(project.types.length > 0).onChange((on) => {
-			// Start from a copy of the role's list so there is something to edit.
-			project.types = on ? structuredClone(role.types) : [];
-			ctx.saveAndRedraw();
-		}))
-		.addToggle((t) => t.setTooltip('Own statuses').setValue(project.statuses.length > 0).onChange((on) => {
-			project.statuses = on ? structuredClone(role.statuses) : [];
-			ctx.saveAndRedraw();
-		}))
-		.addExtraButton((b) => b
-			.setIcon(project.hidden ? 'eye-off' : 'eye')
-			.setTooltip(project.hidden ? 'Hidden from the toolbar (badges kept). Click to show.' : 'Hide from the toolbar, keep badges')
-			.onClick(() => {
-				project.hidden = !project.hidden;
-				ctx.saveAndRedraw();
-			}))
-		.addExtraButton((b) => b.setIcon('trash').setTooltip('Delete project (removes its badges)').onClick(() => {
-			role.projects.splice(index, 1);
-			ctx.saveAndRedraw();
 		}));
 
-	// Colour swatch with the project icon next to the name.
-	const swatch = createSpan({ cls: 'apm-swatch', attr: { style: `--apm-swatch-color:${shade}` } });
-	setIconOrEmoji(swatch, projectIcon(role, project));
-	row.nameEl.prepend(swatch);
-	row.controlEl.prepend(moveButtons(role.projects, project, ctx));
-	row.settingEl.toggleClass('apm-hidden', project.hidden);
+	// Own lists: start from a copy of the role's so there is something to edit.
+	new Setting(details)
+		.setName('Own task types')
+		.setDesc("Off = uses the role's task types.")
+		.addToggle((t) => t.setValue(project.types.length > 0).onChange((on) => {
+			project.types = on ? structuredClone(role.types) : [];
+			ctx.saveAndRedraw();
+		}));
+	if (project.types.length) renderOptionList(details, 'type', role, project, ctx);
+	new Setting(details)
+		.setName('Own statuses')
+		.setDesc("Off = uses the role's statuses.")
+		.addToggle((t) => t.setValue(project.statuses.length > 0).onChange((on) => {
+			project.statuses = on ? structuredClone(role.statuses) : [];
+			ctx.saveAndRedraw();
+		}));
+	if (project.statuses.length) renderOptionList(details, 'status', role, project, ctx);
 
-	// Project-level lists, only when it has its own.
-	const nested = (title: string, render: (box: HTMLElement) => void) => {
-		const box = el.createDiv({ cls: 'apm-nested' });
-		box.createEl('h6', { text: `${project.name} ${title}` });
-		render(box);
-	};
-	if (project.types.length) nested('types', (box) => renderOptionList(box, 'type', project.types, shade, ctx));
-	if (project.statuses.length) nested('statuses', (box) => renderOptionList(box, 'status', project.statuses, shade, ctx));
+	// Danger zone.
+	new Setting(details)
+		.setDesc('Deleting removes its badges. To keep them, hide the project with the eye button instead.')
+		.addButton((b) => b.setButtonText('Delete project').setWarning().onClick(() => {
+			role.projects.remove(project);
+			ctx.saveAndRedraw();
+		}));
 }
 
-// " · due in 38 days" for the row description, or '' with no deadline.
+// "due in 38 days" for the summary line, or '' with no deadline.
 function dueText(deadline: string): string {
 	const days = daysUntil(deadline);
 	if (days === null) return '';
-	if (days === 0) return ' · due today';
-	return days > 0 ? ` · due in ${days} days` : ` · ${-days} days overdue`;
+	if (days === 0) return 'due today';
+	return days > 0 ? `due in ${days} days` : `${-days} days overdue`;
 }

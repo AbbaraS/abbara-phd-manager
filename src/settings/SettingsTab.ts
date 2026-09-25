@@ -4,17 +4,19 @@ import { cloneRoles } from './defaults';
 import { renderRole } from './sections/roleSection';
 import { renderRolesFileInfo } from './sections/rolesFileInfo';
 import { slugify, uniqueId } from '../utils/ids';
+import { BadgeLook, renderBadge } from '../integrations/customBadges';
 
 // Shared helpers passed to every settings section.
 export interface SectionContext {
 	save: () => void;            // save soon (for typing)
 	saveAndRedraw: () => void;   // save now and rebuild the page
-	openRoles: Set<string>;      // roles expanded in the UI
+	openSections: Set<string>;   // collapsible sections expanded in the UI, e.g. "role:phd"
+	renderBadge: (look: BadgeLook) => HTMLElement | null; // badge as notes show it, null without Custom Badges
 }
 
 // The plugin's page in Obsidian settings.
 export class SettingsTab extends PluginSettingTab {
-	private openRoles = new Set<string>();
+	private openSections = new Set<string>();
 
 	constructor(app: App, private plugin: ProjectManagerPlugin) {
 		super(app, plugin);
@@ -31,7 +33,8 @@ export class SettingsTab extends PluginSettingTab {
 				await plugin.saveSettings();
 				this.display();
 			},
-			openRoles: this.openRoles,
+			openSections: this.openSections,
+			renderBadge: (look) => renderBadge(plugin.app, look),
 		};
 
 		// General options.
@@ -77,7 +80,7 @@ export class SettingsTab extends PluginSettingTab {
 			.addButton((b) => b.setButtonText('Add role').setCta().onClick(() => {
 				const id = uniqueId(slugify('role'), settings.roles.map((r) => r.id));
 				settings.roles.push({ id, name: 'New role', icon: 'circle', color: '#888888', hidden: false, projects: [], types: [], statuses: [] });
-				this.openRoles.add(id);
+				this.openSections.add(`role:${id}`);
 				ctx.saveAndRedraw();
 			}))
 			.addButton((b) => b.setButtonText('Reset to defaults').setWarning().onClick(() => {

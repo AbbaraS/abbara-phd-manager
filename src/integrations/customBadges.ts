@@ -19,6 +19,8 @@ interface CustomBadgesPlugin extends Plugin {
 	saveSettings(): Promise<void>;
 	// Newer versions: replaces our badges but keeps styling the user set there (font size etc).
 	setPluginBadges?(pluginId: string, badges: Partial<BadgeDefinition>[]): Promise<string[]>;
+	// Newer versions: a badge element as notes show it, with unsaved changes applied.
+	renderBadge?(key: string, changes: Partial<BadgeDefinition>): HTMLElement;
 }
 
 const PLUGIN_ID = 'custom-badges';
@@ -82,4 +84,12 @@ export async function syncBadges(app: App, roles: Role[], previousKeys: string[]
 	plugin.settings.badges = [...kept, ...wanted];
 	await plugin.saveSettings();
 	return wantedKeys;
+}
+
+// The fields we can preview live in settings.
+export type BadgeLook = Pick<BadgeDefinition, 'key' | 'label' | 'icon' | 'color'>;
+
+// A badge exactly as it will look in a note, or null when Custom Badges can't draw one.
+export function renderBadge(app: App, look: BadgeLook): HTMLElement | null {
+	return getCustomBadges(app)?.renderBadge?.(look.key, look) ?? null;
 }

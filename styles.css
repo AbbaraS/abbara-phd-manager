@@ -46,28 +46,102 @@
 
 /* ---------- Settings page ---------- */
 
-/* Collapsible role block. */
-.apm-role {
+/* Collapsible sections: roles, projects, task types and statuses. */
+.apm-section {
 	margin: var(--size-4-2) 0;
 	padding: var(--size-4-2) var(--size-4-3);
 	border: 1px solid var(--background-modifier-border);
-	border-left: 4px solid var(--apm-role-color, var(--interactive-accent));
 	border-radius: var(--radius-m);
 }
 
-.apm-role-summary {
+/* Role: thick bar in the role colour. */
+.apm-role {
+	border-left: 4px solid var(--apm-role-color, var(--interactive-accent));
+}
+
+/* Projects, types and statuses: thinner bar in their own colour, on a darker card. */
+.apm-project,
+.apm-option {
+	padding-block: var(--size-4-1);
+	border-left: 3px solid var(--apm-swatch-color, var(--background-modifier-border));
+	background: var(--background-secondary);
+}
+
+/* Summary line: chevron, icon, name, extra info, then buttons on the right. */
+.apm-section-summary {
 	display: flex;
 	align-items: center;
 	gap: var(--size-4-2);
-	font-weight: var(--font-semibold);
+	min-height: 28px;
+	font-weight: var(--font-medium);
 	cursor: pointer;
+	list-style: none;
+}
+.apm-section-summary::-webkit-details-marker {
+	display: none;
+}
+.apm-section-summary::before {
+	content: '';
+	flex: none;
+	width: 6px;
+	height: 6px;
+	margin-right: 2px;
+	border-right: 2px solid var(--text-muted);
+	border-bottom: 2px solid var(--text-muted);
+	transform: rotate(-45deg);
+	transition: transform 0.1s ease;
+}
+details[open] > .apm-section-summary::before {
+	transform: rotate(45deg);
+}
+.apm-role > .apm-section-summary {
+	font-weight: var(--font-semibold);
+}
+details[open] > .apm-section-summary {
+	margin-bottom: var(--size-4-1);
 }
 
-/* Project icon in its colour, next to the project name. */
+/* Title: the badge as notes show it (or icon + name without Custom Badges). */
+.apm-section-title {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-width: 0;
+}
+
+/* Due date etc. next to the name. */
+.apm-section-meta {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal);
+}
+
+/* Show/hide and move buttons, pushed to the right of the summary. */
+.apm-summary-actions {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	margin-left: auto;
+}
+
+/* Lucide icon drawn next to an icon text box; hidden for emoji or unknown names. */
+.apm-icon-preview {
+	display: inline-flex;
+	color: var(--text-muted);
+}
+.apm-icon-preview.is-unknown,
+.apm-icon-preview:empty {
+	display: none;
+}
+.apm-icon-preview svg {
+	width: 18px;
+	height: 18px;
+}
+
+/* Project, type or status icon in its colour, next to its name. */
 .apm-swatch {
 	display: inline-flex;
 	vertical-align: middle;
-	margin-right: var(--size-4-2);
 	color: var(--apm-swatch-color);
 }
 
@@ -76,9 +150,8 @@
 	height: 14px;
 }
 
-/* Hidden roles/projects: faded, still editable. */
-.apm-role.apm-hidden > .apm-role-summary,
-.apm-project-row.apm-hidden {
+/* Hidden roles/projects: faded summary, still editable. */
+.apm-section.apm-hidden > .apm-section-summary {
 	opacity: 0.55;
 }
 
@@ -98,16 +171,9 @@
 	font-size: var(--font-ui-smaller);
 }
 
-/* Indent project-level types. */
-.apm-nested {
-	margin-left: var(--size-4-6);
-	padding-left: var(--size-4-3);
-	border-left: 1px dashed var(--background-modifier-border);
-}
-
-/* Keep type rows compact. */
-.apm-type-row input[type="text"] {
-	width: 9em;
+/* A project's own types/statuses, indented under its toggle. */
+.apm-project .apm-option-list {
+	margin-left: var(--size-4-4);
 }
 
 /* Error shown when the roles file can't be read. */
@@ -337,14 +403,10 @@
 	margin-left: auto;
 }
 
-/* Up/down buttons for roles (summary) and projects (row). */
+/* Up/down buttons on each section's summary line. */
 .apm-move {
 	display: inline-flex;
 	gap: var(--size-2-1);
-}
-
-.apm-role-summary > .apm-move {
-	margin-left: auto;
 }
 
 .apm-move button:disabled {
