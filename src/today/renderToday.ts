@@ -18,7 +18,9 @@ export interface TodaySpec {
 	roles: TodayRole[];     // roles with tasks in this note, in settings order
 	filter: ReadonlySet<string>; // roles currently shown (empty = all)
 	hideDone: boolean;
+	pinned: boolean;        // panel is pinned above the note
 	onToggleDone: () => void;
+	onTogglePin: () => void;
 	onRoleClick: (id: string) => void;
 }
 
@@ -27,6 +29,7 @@ const pct = (t: Tally) => (totalOf(t) ? Math.round((t.done / totalOf(t)) * 100) 
 // Draw the panel: a summary line, then one chip per role.
 export function renderToday(el: HTMLElement, spec: TodaySpec): void {
 	const panel = el.createDiv({ cls: 'apm-today' });
+	keepClicksInside(panel);
 	if (!totalOf(spec.overall)) {
 		panel.createDiv({ cls: 'apm-today-empty', text: `${spec.title}: no tasks yet. Add one from the toolbar.` });
 		return;
@@ -36,7 +39,7 @@ export function renderToday(el: HTMLElement, spec: TodaySpec): void {
 	spec.roles.forEach((role) => renderRole(grid, role, spec));
 }
 
-// Line 1: title, done / added / open, and an overall progress bar.
+// Line 1: title, done / added / open, an overall progress bar and the pin button.
 function renderSummary(panel: HTMLElement, spec: TodaySpec): void {
 	const { overall } = spec;
 	const row = panel.createDiv({ cls: 'apm-today-summary' });
@@ -51,13 +54,20 @@ function renderSummary(panel: HTMLElement, spec: TodaySpec): void {
 	eye.addEventListener('click', spec.onToggleDone);
 
 	kpi(row, 'is-added', 'circle-plus', `+${overall.added}`, 'added');
-	kpi(row, 'is-open', 'circle-dashed', String(overall.open), 'open');
+	kpi(row, 'is-open', 'circle-dashed', String(overall.open), 'to do');
 
 	// Overall bar.
 	const meter = row.createDiv({ cls: 'apm-today-meter' });
 	const bar = meter.createDiv({ cls: 'apm-today-bar', attr: { role: 'progressbar', 'aria-valuenow': String(pct(overall)) } });
 	bar.createDiv({ cls: 'apm-today-fill', attr: { style: `width:${pct(overall)}%` } });
 	meter.createSpan({ cls: 'apm-today-pct', text: `${pct(overall)}%` });
+
+	// Pin: keep the panel above the note so it never scrolls away.
+	const pin = row.createEl('button', { cls: 'apm-today-pin clickable-icon' });
+	pin.toggleClass('is-active', spec.pinned);
+	setIcon(pin, spec.pinned ? 'pin-off' : 'pin');
+	setTooltip(pin, spec.pinned ? 'Unpin: put the panel back in the note' : 'Pin to the top of the note');
+	pin.addEventListener('click', spec.onTogglePin);
 }
 
 // One number with an icon and a word, e.g. "✓ 18/39 done".
@@ -91,6 +101,16 @@ function renderRole(grid: HTMLElement, role: TodayRole, spec: TodaySpec): void {
 	bar.createDiv({ cls: 'apm-today-role-fill', attr: { style: `width:${pct(tally)}%` } });
 
 	const action = active && spec.filter.size === 1 ? 'Click to show all roles' : `Click to show only ${role.name}`;
-	setTooltip(chip, `${role.name}: ${tally.done} of ${totalOf(tally)} done, ${tally.added} added today, ${tally.open} open. ${action}`);
+	setTooltip(chip, `${role.name}: ${tally.done} of ${totalOf(tally)} done, ${tally.added} added today, ${tally.open} to do. ${action}`);
 	chip.addEventListener('click', () => spec.onRoleClick(role.id));
+}
+
+// In live preview, a click on a rendered code block moves the cursor into it and shows the source.
+// The panel is all buttons, so its clicks stop here (after the buttons have handled them).
+function keepClicksInside(panel: HTMLElement): void {
+	panel.addEventListener('mousedown', (evt) => {
+		evt.preventDefault();
+		evt.stopPropagation();
+	});
+	panel.addEventListener('click', (evt) => evt.stopPropagation());
 }

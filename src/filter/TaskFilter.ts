@@ -38,6 +38,19 @@ export class TaskFilter extends Events {
 		return this.plugin.settings.hideCompleted;
 	}
 
+	// Role groups folded into their divider (saved).
+	get collapsed(): ReadonlySet<string> {
+		return new Set(this.plugin.settings.collapsedRoles);
+	}
+
+	// Divider chevron: fold a role's group away, or open it again. Remembered across restarts.
+	toggleCollapse(role: string): void {
+		const list = this.plugin.settings.collapsedRoles;
+		this.plugin.settings.collapsedRoles = list.includes(role) ? list.filter((r) => r !== role) : [...list, role];
+		void this.plugin.saveOptions();
+		this.refreshEditors();
+	}
+
 	// Eye button: hide or show ticked and cancelled tasks, remembered across restarts.
 	toggleDone(): void {
 		this.plugin.settings.hideCompleted = !this.hideDone;
@@ -103,6 +116,7 @@ export class TaskFilter extends Events {
 			hideDone: this.hideDone,
 			roles: this.roles,
 			dividers: settings.roleDividers,
+			collapsed: this.collapsed,
 			taskOf: this.taskOf,
 			lookOf: (id) => {
 				const role = settings.roles.find((r) => r.id === id);
@@ -110,7 +124,10 @@ export class TaskFilter extends Events {
 					? { role: id, name: role.name, icon: role.icon, color: role.color }
 					: { role: '', name: 'Other', icon: 'circle-dashed', color: '#888888' };
 			},
-			onDividerClick: (id) => this.showOnly(id),
+			actions: {
+				onFilter: (id) => this.showOnly(id),
+				onToggle: (id) => this.toggleCollapse(id),
+			},
 		};
 	}
 }

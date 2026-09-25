@@ -47,6 +47,8 @@ export interface ManagerSettings {
 	insertInOrder: boolean;      // toolbar puts a new task at its role/project spot, not at the cursor
 	roleDividers: boolean;       // draw a role label above each role's group of tasks
 	hideCompleted: boolean;      // hide ticked and cancelled tasks (toolbar eye button)
+	collapsedRoles: string[];    // role ids whose task group is folded into its divider ('' = no role)
+	pinToday: boolean;           // show the Today panel pinned above the note instead of inside it
 	doneBadgeLook: DoneBadgeLook; // badges on ticked tasks: grey, struck through, both or unchanged
 	syncBadges: boolean;         // push role/project/type/status badges into Custom Badges
 	managedBadgeKeys: string[];  // badge keys this plugin created, so it can tidy them up

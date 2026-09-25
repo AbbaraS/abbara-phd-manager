@@ -13,6 +13,8 @@ export const DEFAULT_SETTINGS: ManagerSettings = {
 	insertInOrder: true,
 	roleDividers: true,
 	hideCompleted: false,
+	collapsedRoles: [],
+	pinToday: false,
 	doneBadgeLook: 'grey-strike',
 	syncBadges: true,
 	managedBadgeKeys: [],

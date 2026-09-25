@@ -55,6 +55,8 @@ Add both blocks to your daily template, above the task list:
 - **Filter by role**: click a role chip in the Today panel or a role divider to show only that role (click again for all). The filter button in the toolbar lets you tick several roles. The filter resets when Obsidian restarts. Command: *Show tasks from all roles*.
 - The line you're typing on always stays visible, so a new task never vanishes while you write it.
 - **Role dividers**: a role label with done/total is drawn above each role's group of tasks. It's not saved in the note, so Rollover and sorting keep working. Only lists with two or more roles get dividers.
+- **Collapse a role**: click the chevron at the left of a divider to fold that role's tasks away (the divider stays, showing how many are open). Click it again to open them. Remembered across restarts. The group opens by itself while the cursor is inside it.
+- **Pin the Today panel**: the pin button at the end of the panel's first line moves it above the note, under the toolbar, so it stays in view while you scroll. The copy in the note hides while it's pinned. Click the pin again (or run *Pin / unpin the Today panel*) to put it back. Only notes that have an `apm-today` block get the pinned panel.
 - **Add new tasks in order**: a task added from the toolbar goes straight to the end of its role → project group (in the list the cursor is in, else the biggest task list), not at the cursor. Turn off in settings to insert at the cursor again.
 - **Badges on completed tasks**: grey + strikethrough by default (settings: grey, strikethrough, both or unchanged).
 
@@ -97,7 +99,9 @@ src/
     DividerWidget.ts               the role label drawn above a group
     filterMenu.ts                  toolbar filter menu
   today/
-    TodayBlock.ts                  ```apm-today``` block
+    TodayBlock.ts                  ```apm-today``` block (hides while pinned)
+    PinnedToday.ts                 the pinned copy above the note + pin toggle
+    todaySpec.ts                   gathers the panel's numbers and buttons
     countToday.ts                  done / added / open counts (pure)
     renderToday.ts                 draws the two-line panel
   display/
@@ -178,7 +182,6 @@ Test vault: `myPluginTestVault/.obsidian/plugins/abbara-phd-manager` is a symlin
 
 - "New task" command + hotkey (same flow as the toolbar, via a modal)
 - Dashboard view: open tasks grouped by role/project
-- Collapse a role group by clicking its divider chevron
 - Role filter in reading view
 - Due dates, priorities, status
 - Confirm before "Reset to defaults"

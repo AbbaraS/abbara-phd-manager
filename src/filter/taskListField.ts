@@ -2,7 +2,7 @@ import { EditorState, Extension, Prec, Range, StateEffect, StateField } from '@c
 import { Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { TFile, editorInfoField } from 'obsidian';
 import { LineTask, planTaskList } from './planTaskList';
-import { DividerLook, DividerWidget } from './DividerWidget';
+import { DividerActions, DividerLook, DividerWidget } from './DividerWidget';
 
 // Everything the editor extension asks the plugin for, read fresh on each redraw.
 export interface TaskListContext {
@@ -10,9 +10,10 @@ export interface TaskListContext {
 	hideDone: boolean;
 	roles: ReadonlySet<string>;                // role filter (empty = all)
 	dividers: boolean;
+	collapsed: ReadonlySet<string>;            // folded role groups
 	taskOf: (line: string) => LineTask | null;
-	lookOf: (role: string) => Omit<DividerLook, 'done' | 'total' | 'active'>;
-	onDividerClick: (role: string) => void;
+	lookOf: (role: string) => Pick<DividerLook, 'role' | 'name' | 'icon' | 'color'>;
+	actions: DividerActions;                   // divider clicks
 }
 
 // Sent to every editor when the filter, roles or settings change.
@@ -43,6 +44,7 @@ function build(state: EditorState, ctx: TaskListContext, keepSelection: boolean)
 		hideDone: ctx.hideDone,
 		roles: ctx.roles,
 		dividers: ctx.dividers,
+		collapsed: ctx.collapsed,
 		keep: keepSelection ? selectedLines(state) : new Set(),
 	});
 	const decos: Range<Decoration>[] = [];
@@ -55,15 +57,22 @@ function build(state: EditorState, ctx: TaskListContext, keepSelection: boolean)
 	}
 
 	// Role dividers, as block widgets above their first visible task.
+	const lookFor = (d: { role: string; done: number; total: number }, collapsed: boolean): DividerLook =>
+		({ ...ctx.lookOf(d.role), done: d.done, total: d.total, active: ctx.roles.has(d.role), collapsed });
 	for (const divider of plan.dividers) {
-		const look = { ...ctx.lookOf(divider.role), done: divider.done, total: divider.total, active: ctx.roles.has(divider.role) };
-		const widget = Decoration.widget({ widget: new DividerWidget(look, ctx.onDividerClick), block: true, side: -1 });
-		decos.push(widget.range(doc.line(divider.line + 1).from));
+		const widget = new DividerWidget(lookFor(divider, false), ctx.actions);
+		decos.push(Decoration.widget({ widget, block: true, side: -1 }).range(doc.line(divider.line + 1).from));
+	}
+
+	// Collapsed groups: the divider replaces the group's lines, like a fold.
+	for (const fold of plan.folds) {
+		const widget = new DividerWidget(lookFor(fold, true), ctx.actions);
+		decos.push(Decoration.replace({ widget, block: true }).range(doc.line(fold.line + 1).from, doc.line(fold.last + 1).to));
 	}
 	return Decoration.set(decos, true);
 }
 
-// Editor extension: hides tasks (completed / other roles) and draws role dividers.
+// Editor extension: hides tasks (completed / other roles), draws role dividers and folds collapsed groups.
 // A state field, because hiding whole lines and block widgets can't come from a view plugin.
 export function taskListField(context: () => TaskListContext): Extension {
 	const field = StateField.define<DecorationSet>({

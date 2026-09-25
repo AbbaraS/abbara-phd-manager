@@ -15,6 +15,7 @@ import { PROGRESS_BLOCK, ProgressBlock, parseFilter } from './progress/ProgressB
 import { TaskSorter } from './sort/TaskSorter';
 import { TaskFilter } from './filter/TaskFilter';
 import { TODAY_BLOCK, TodayBlock } from './today/TodayBlock';
+import { PinnedToday } from './today/PinnedToday';
 import { DoneBadgeLookManager } from './display/doneBadgeLook';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
@@ -22,6 +23,7 @@ export default class ProjectManagerPlugin extends Plugin {
 	settings!: ManagerSettings;
 	tasks = new TaskStore(this);
 	filter = new TaskFilter(this);
+	pinnedToday = new PinnedToday(this);
 	rolesFile = new RolesFile(this, (roles) => void this.onRolesFileEdited(roles));
 	private toolbar = new ToolbarManager(this);
 	sorter = new TaskSorter(this);
@@ -51,10 +53,11 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(PROGRESS_BLOCK, (source, el, ctx) =>
 			ctx.addChild(new ProgressBlock(el, this, parseFilter(source))),
 		);
-		// Today panel: done / added / open for this daily note.
+		// Today panel: done / added / open for this daily note, in the note or pinned above it.
 		this.registerMarkdownCodeBlockProcessor(TODAY_BLOCK, (_source, el, ctx) =>
 			ctx.addChild(new TodayBlock(el, this, ctx.sourcePath)),
 		);
+		this.pinnedToday.register();
 
 		// Task order: command + auto-sort of new daily notes.
 		this.sorter.register();
@@ -78,6 +81,7 @@ export default class ProjectManagerPlugin extends Plugin {
 
 	onunload(): void {
 		this.toolbar.removeAll();
+		this.pinnedToday.removeAll();
 		this.doneLook.clear();
 	}
 
@@ -104,6 +108,7 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.toolbar.refresh();
 		this.tasks.changed();
 		this.filter.rolesChanged();
+		this.pinnedToday.refresh();
 		this.doneLook.apply();
 	}
 

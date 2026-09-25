@@ -497,6 +497,40 @@ details[open] > .apm-section-summary {
 	font-variant-numeric: tabular-nums;
 }
 
+/* Chevron: collapse / expand the group. */
+.apm-divider-chevron {
+	display: inline-flex;
+	flex: none;
+	height: auto;
+	padding: 1px;
+	margin-left: -4px;
+	color: var(--text-faint);
+}
+
+.apm-divider-chevron:hover {
+	color: var(--text-normal);
+}
+
+.apm-divider-chevron svg {
+	width: 14px;
+	height: 14px;
+}
+
+/* Collapsed group: dashed line and a tinted row, so it reads as "more in here". */
+.apm-divider.is-collapsed {
+	padding-bottom: var(--size-4-1);
+}
+
+.apm-divider.is-collapsed .apm-divider-rule {
+	height: 0;
+	border-top: 1px dashed color-mix(in srgb, var(--apm-role-color) 45%, var(--background-modifier-border));
+	background: none;
+}
+
+.apm-divider.is-collapsed .apm-divider-chevron {
+	color: var(--apm-role-color);
+}
+
 /* Role pill: click to show only this role. */
 .apm-divider-label {
 	display: inline-flex;
@@ -623,6 +657,45 @@ details[open] > .apm-section-summary {
 
 .apm-today-eye.is-active {
 	color: var(--interactive-accent);
+}
+
+/* Pin button, at the end of line 1. */
+.apm-today-pin {
+	flex: none;
+	height: auto;
+	padding: 2px;
+	color: var(--text-faint);
+}
+
+.apm-today-pin svg {
+	width: 14px;
+	height: 14px;
+}
+
+.apm-today-pin.is-active {
+	color: var(--interactive-accent);
+}
+
+/* In live preview, Obsidian's "edit block" button sits over the top-right corner: keep the pin clear of it. */
+.cm-embed-block .apm-today-summary {
+	padding-right: var(--size-4-8);
+}
+
+/* Pinned: the panel sits above the note (under the toolbar) and never scrolls away. */
+.apm-today-pinned {
+	flex: none;
+	padding: var(--size-4-2) var(--size-4-4);
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+}
+
+.apm-today-pinned .apm-today {
+	margin: 0;
+}
+
+/* The in-note block while the panel is pinned: take no space. */
+.apm-today-block-pinned {
+	display: none;
 }
 
 /* Overall bar: takes the rest of the line. */

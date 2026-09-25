@@ -12,6 +12,7 @@ import { showFilterMenu } from '../filter/filterMenu';
 import { CreateProject, pickTask } from './pickTask';
 import { NewProjectModal } from './NewProjectModal';
 import { renderToolbar, TOOLBAR_CLASS } from './renderToolbar';
+import { PINNED_CLASS } from '../today/PinnedToday';
 
 // Class on a note's container while completed tasks are hidden (used by reading view CSS).
 const HIDE_DONE_CLASS = 'apm-hide-done';
@@ -60,8 +61,9 @@ export class ToolbarManager {
 			onFilter: (evt) => showFilterMenu(evt, settings.roles, filter),
 			onSort: () => plugin.sorter.sortEditor(view.editor),
 		});
-		// Sit between the note header and its content.
-		view.containerEl.insertBefore(bar, view.contentEl);
+		// Sit between the note header and its content (above the pinned Today panel, if any).
+		const below = view.containerEl.querySelector<HTMLElement>(`:scope > .${PINNED_CLASS}`) ?? view.contentEl;
+		view.containerEl.insertBefore(bar, below);
 	}
 
 	// Add the picked task: at its role/project spot in the list, or at the cursor.

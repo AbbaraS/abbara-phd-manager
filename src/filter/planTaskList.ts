@@ -13,6 +13,7 @@ export interface ViewOptions {
 	hideDone: boolean;            // hide ticked and cancelled tasks
 	roles: ReadonlySet<string>;   // show only these roles' tasks (empty = all)
 	dividers: boolean;            // label each role's group of tasks
+	collapsed: ReadonlySet<string>; // roles whose group is folded into its divider
 	keep: ReadonlySet<number>;    // lines never hidden (where the cursor is)
 }
 
@@ -24,10 +25,16 @@ export interface Divider {
 	total: number; // tasks in the group, not counting cancelled
 }
 
-// The result: lines to hide (inclusive ranges) and dividers to draw.
+// A collapsed group: lines `line` to `last` are replaced by its divider.
+export interface Fold extends Divider {
+	last: number; // inclusive
+}
+
+// The result: lines to hide (inclusive ranges), dividers to draw, and folded groups.
 export interface TaskListPlan {
 	hidden: Array<[number, number]>;
 	dividers: Divider[];
+	folds: Fold[];
 }
 
 // One top-level list item with its line span and task info.
@@ -44,6 +51,7 @@ const isClosed = (task: LineTask) => task.state !== 'open';
 export function planTaskList(lines: string[], taskOf: (line: string) => LineTask | null, opts: ViewOptions): TaskListPlan {
 	const hide = new Set<number>();
 	const dividers: Divider[] = [];
+	const folds: Fold[] = [];
 
 	for (const block of listBlocks(lines)) {
 		let at = block.start;
@@ -61,9 +69,13 @@ export function planTaskList(lines: string[], taskOf: (line: string) => LineTask
 				hideClosedSubtasks(lines, item, taskOf, opts.keep, hide);
 			}
 		}
-		if (opts.dividers) dividers.push(...blockDividers(items, hide));
+		if (opts.dividers) blockDividers(items, hide, opts, dividers, folds);
 	}
-	return { hidden: toRanges(hide), dividers };
+
+	// A fold replaces its lines, plus any hidden lines straight after it, so they aren't hidden twice.
+	for (const fold of folds) for (let n = fold.line; n <= fold.last; n++) hide.delete(n);
+	for (const fold of folds) while (hide.delete(fold.last + 1)) fold.last++;
+	return { hidden: toRanges(hide), dividers, folds };
 }
 
 // Hidden by "hide completed" or by the role filter. Plain list items always stay.
@@ -92,10 +104,11 @@ function hideClosedSubtasks(lines: string[], item: Item, taskOf: (line: string) 
 }
 
 // One divider above each run of same-role tasks, only in lists with two or more roles.
-// Plain list items join the run above them. A run with every item hidden gets no divider.
-function blockDividers(items: Item[], hide: Set<number>): Divider[] {
+// Plain list items join the run above them. A run with every task hidden gets no divider.
+// A collapsed run becomes a fold instead, unless the cursor is inside it.
+function blockDividers(items: Item[], hide: Set<number>, opts: ViewOptions, dividers: Divider[], folds: Fold[]): void {
 	const roles = new Set(items.flatMap((item) => (item.task ? [item.task.role] : [])));
-	if (roles.size < 2) return [];
+	if (roles.size < 2) return;
 
 	// Split into runs.
 	const runs: { role: string; items: Item[] }[] = [];
@@ -107,19 +120,20 @@ function blockDividers(items: Item[], hide: Set<number>): Divider[] {
 	}
 
 	// Count and place.
-	const out: Divider[] = [];
 	for (const run of runs) {
-		const first = run.items.find((item) => !hide.has(item.start));
+		const first = run.items.find((item) => item.task && !hide.has(item.start));
 		if (!first) continue;
 		const tasks = run.items.flatMap((item) => (item.task ? [item.task] : []));
-		out.push({
-			line: first.start,
+		const counts = {
 			role: run.role,
 			done: tasks.filter((t) => t.state === 'done').length,
 			total: tasks.filter((t) => t.state !== 'cancelled').length,
-		});
+		};
+		const start = run.items[0].start;
+		const end = run.items[run.items.length - 1].end;
+		if (opts.collapsed.has(run.role) && !touches(start, end, opts.keep)) folds.push({ ...counts, line: start, last: end });
+		else dividers.push({ ...counts, line: first.start });
 	}
-	return out;
 }
 
 // Line numbers -> sorted inclusive ranges, e.g. {3,4,5,9} -> [[3,5],[9,9]].
