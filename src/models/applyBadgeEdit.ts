@@ -1,7 +1,7 @@
 import { Role } from './types';
 import { buildBadgeIndex } from './badgeIndex';
 import { autoOptionColor, optionsFor, projectColor } from './resolve';
-import { pastel, toHex } from '../utils/colour';
+import { toHex } from '../utils/colour';
 
 // The badge fields Custom Badges sends back after an edit in its settings.
 export interface EditedBadge {
@@ -48,15 +48,14 @@ export function applyBadgeEdit(roles: Role[], badge: EditedBadge): boolean {
 		return true;
 	}
 
-	// Type or status. Types are always sent as pastel, so compare against that.
+	// Type or status.
 	const { kind, role, project, option } = entry;
 	if (label) option.name = label;
 	option.icon = icon;
 	if (color) {
 		const base = project ? projectColor(role, project) : role.color;
 		const auto = toHex(autoOptionColor(kind, optionsFor(kind, role, project), option, base));
-		const autoShown = kind === 'type' ? toHex(pastel(auto)) : auto;
-		option.color = color === autoShown ? '' : color;
+		option.color = color === auto ? '' : color;
 	}
 	return true;
 }

@@ -48,12 +48,6 @@ export function shadeOf(base: string, index: number, count: number): string {
 	return hslToHex({ ...hsl, l: hsl.l + step * (index + 1) });
 }
 
-// Soft pastel version of `hex`: same hue, gentle saturation, very light.
-export function pastel(hex: string): string {
-	const { h, s } = hexToHsl(hex);
-	return hslToHex({ h, s: Math.min(s, 70), l: 82 });
-}
-
 // Pastel number `index` of `count`, spread round the colour wheel from `base`'s hue.
 export function pastelOf(base: string, index: number, count: number): string {
 	const { h } = hexToHsl(base);

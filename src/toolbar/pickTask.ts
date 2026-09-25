@@ -2,6 +2,7 @@ import { Menu } from 'obsidian';
 import { Project, Role } from '../models/types';
 import { projectIcon, typesFor, visibleProjects } from '../models/resolve';
 import { TaskChoice } from '../tasks/taskLine';
+import { titleAndIcon } from '../utils/icon';
 
 type Point = { x: number; y: number };
 
@@ -17,7 +18,7 @@ function pickType(at: Point, role: Role, project: Project | undefined, done: (c:
 	menu.addItem((i) => i.setTitle('No type').setIcon('circle').onClick(() => done({ role, project })));
 	menu.addSeparator();
 	types.forEach((type) =>
-		menu.addItem((i) => i.setTitle(type.name).setIcon(type.icon).onClick(() => done({ role, project, type }))),
+		menu.addItem((i) => titleAndIcon(i, type.name, type.icon).onClick(() => done({ role, project, type }))),
 	);
 	menu.showAtPosition(at);
 }
@@ -31,10 +32,10 @@ export function pickTask(evt: MouseEvent, role: Role, createProject: CreateProje
 	};
 
 	const menu = new Menu();
-	menu.addItem((i) => i.setTitle(`${role.name} (no project)`).setIcon(role.icon).onClick(() => next()));
+	menu.addItem((i) => titleAndIcon(i, `${role.name} (no project)`, role.icon).onClick(() => next()));
 	menu.addSeparator();
 	visibleProjects(role).forEach((project) =>
-		menu.addItem((i) => i.setTitle(project.name).setIcon(projectIcon(role, project)).onClick(() => next(project))),
+		menu.addItem((i) => titleAndIcon(i, project.name, projectIcon(role, project)).onClick(() => next(project))),
 	);
 	menu.addSeparator();
 	menu.addItem((i) => i.setTitle('New project…').setIcon('plus').onClick(() => createProject(role, next)));

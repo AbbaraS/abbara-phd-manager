@@ -1,5 +1,5 @@
 import { Project, Role, TaskOption, TaskStatus, TaskType } from './types';
-import { pastel, pastelOf, shadeOf } from '../utils/colour';
+import { pastelOf, shadeOf } from '../utils/colour';
 import { STATUS_PALETTE } from '../defaults/statuses';
 
 // Which list an option belongs to; also the letter used in its badge key.
@@ -57,8 +57,7 @@ export function autoOptionColor(kind: OptionKind, list: TaskOption[], option: Ta
 	return kind === 'type' ? pastelOf(base, index, list.length) : STATUS_PALETTE[index % STATUS_PALETTE.length];
 }
 
-// Colour sent to Custom Badges: types are always pastel, statuses as picked.
+// Colour sent to Custom Badges: the picked colour, or the auto one.
 export function optionBadgeColor(kind: OptionKind, list: TaskOption[], option: TaskOption, base: string): string {
-	const colour = option.color || autoOptionColor(kind, list, option, base);
-	return kind === 'type' ? pastel(colour) : colour;
+	return option.color || autoOptionColor(kind, list, option, base);
 }

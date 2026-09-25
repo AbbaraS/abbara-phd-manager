@@ -1,10 +1,11 @@
-import { Setting, setIcon } from 'obsidian';
+import { Setting } from 'obsidian';
 import { Project, Role } from '../../models/types';
 import { projectColor, projectIcon } from '../../models/resolve';
 import { renderOptionList } from './optionList';
 import { moveButtons } from './moveButtons';
 import { daysUntil } from '../../utils/dates';
 import type { SectionContext } from '../SettingsTab';
+import { setIconOrEmoji } from '../../utils/icon';
 
 // One project row, plus its own types/statuses when it overrides the role's.
 export function renderProject(el: HTMLElement, role: Role, project: Project, ctx: SectionContext): void {
@@ -19,7 +20,7 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 			project.name = v;
 			ctx.save();
 		}))
-		.addText((t) => t.setPlaceholder(`Icon (${role.icon})`).setValue(project.icon).onChange((v) => {
+		.addText((t) => t.setPlaceholder(`Icon or emoji (${role.icon})`).setValue(project.icon).onChange((v) => {
 			project.icon = v.trim();
 			ctx.save();
 		}))
@@ -62,7 +63,7 @@ export function renderProject(el: HTMLElement, role: Role, project: Project, ctx
 
 	// Colour swatch with the project icon next to the name.
 	const swatch = createSpan({ cls: 'apm-swatch', attr: { style: `--apm-swatch-color:${shade}` } });
-	setIcon(swatch, projectIcon(role, project));
+	setIconOrEmoji(swatch, projectIcon(role, project));
 	row.nameEl.prepend(swatch);
 	row.controlEl.prepend(moveButtons(role.projects, project, ctx));
 	row.settingEl.toggleClass('apm-hidden', project.hidden);

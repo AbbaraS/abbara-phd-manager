@@ -1,5 +1,6 @@
 import { setIcon } from 'obsidian';
 import { Role } from '../models/types';
+import { setIconOrEmoji } from '../utils/icon';
 
 export const TOOLBAR_CLASS = 'apm-toolbar';
 
@@ -10,7 +11,7 @@ export function renderToolbar(roles: Role[], onRoleClick: (evt: MouseEvent, role
 	for (const role of roles) {
 		const button = bar.createEl('button', { cls: 'apm-role-button', attr: { 'aria-label': `New ${role.name} task` } });
 		button.style.setProperty('--apm-role-color', role.color);
-		setIcon(button.createSpan({ cls: 'apm-role-icon' }), role.icon);
+		setIconOrEmoji(button.createSpan({ cls: 'apm-role-icon' }), role.icon);
 		button.createSpan({ cls: 'apm-role-name', text: role.name });
 		button.addEventListener('click', (evt) => onRoleClick(evt, role));
 	}

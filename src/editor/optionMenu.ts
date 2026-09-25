@@ -4,6 +4,7 @@ import { OptionKind, optionKey, optionsFor } from '../models/resolve';
 import { buildBadgeIndex } from '../models/badgeIndex';
 import { insertAfter, readTask } from '../tasks/readTask';
 import { setBadge } from '../tasks/taskBadges';
+import { titleAndIcon } from '../utils/icon';
 
 type Point = { x: number; y: number };
 
@@ -24,7 +25,7 @@ export function showOptionMenu(at: Point, kind: OptionKind, line: string, roles:
 	const menu = new Menu();
 	for (const option of options) {
 		const key = optionKey(kind, task.role, option, task.project);
-		menu.addItem((i) => i.setTitle(option.name).setIcon(option.icon).setChecked(key === current).onClick(() => pick(key)));
+		menu.addItem((i) => titleAndIcon(i, option.name, option.icon).setChecked(key === current).onClick(() => pick(key)));
 	}
 	if (current) {
 		menu.addSeparator();

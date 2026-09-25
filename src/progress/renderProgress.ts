@@ -1,6 +1,7 @@
 import { moment, setIcon } from 'obsidian';
 import { weeksAndDays } from '../utils/dates';
 import { ProgressRow } from './progressRows';
+import { setIconOrEmoji } from '../utils/icon';
 
 // Plural helper: 1 day, 2 days.
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -30,7 +31,7 @@ function renderCard(grid: HTMLElement, row: ProgressRow): void {
 
 	// Header.
 	const head = card.createDiv({ cls: 'apm-card-head' });
-	setIcon(head.createSpan({ cls: 'apm-card-icon' }), row.icon);
+	setIconOrEmoji(head.createSpan({ cls: 'apm-card-icon' }), row.icon);
 	const title = head.createDiv({ cls: 'apm-card-title' });
 	title.createDiv({ cls: 'apm-card-name', text: row.project.name });
 	title.createDiv({ cls: 'apm-card-role', text: row.role.name });

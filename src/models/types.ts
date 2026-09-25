@@ -3,7 +3,7 @@ export interface TaskOption {
 	id: string;    // short key used in badge names
 	name: string;  // display name
 	icon: string;  // Lucide icon name
-	color: string; // hex colour, empty = auto (pastel for types, status palette for statuses)
+	color: string; // hex colour, empty = auto (spread of soft hues for types, status palette for statuses)
 }
 
 // Same shape, named for readability where it matters.

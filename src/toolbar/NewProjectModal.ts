@@ -29,7 +29,7 @@ export class NewProjectModal extends Modal {
 			window.setTimeout(() => t.inputEl.focus(), 0);
 		});
 
-		new Setting(contentEl).setName('Icon').setDesc('Lucide icon name, empty = the role icon.')
+		new Setting(contentEl).setName('Icon').setDesc('Lucide icon name or an emoji, empty = the role icon.')
 			.addText((t) => t.setPlaceholder(role.icon).onChange((v) => (fields.icon = v.trim())));
 		new Setting(contentEl).setName('Deadline').setDesc('Optional. Shows a card in the progress block.')
 			.addText((t) => {

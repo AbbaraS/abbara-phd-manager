@@ -1,4 +1,4 @@
-import { Setting, setIcon } from 'obsidian';
+import { Setting } from 'obsidian';
 import { Role } from '../../models/types';
 import { slugify } from '../../utils/ids';
 import { blankProject } from '../../models/newProject';
@@ -6,6 +6,7 @@ import { moveButtons } from './moveButtons';
 import { renderProject } from './projectSection';
 import { renderOptionList } from './optionList';
 import type { SectionContext } from '../SettingsTab';
+import { setIconOrEmoji } from '../../utils/icon';
 
 // Collapsible block for one role: details, projects and types.
 export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: SectionContext): void {
@@ -20,7 +21,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 
 	// Summary line: coloured icon + name.
 	const summary = details.createEl('summary', { cls: 'apm-role-summary' });
-	setIcon(summary.createSpan({ cls: 'apm-role-icon' }), role.icon);
+	setIconOrEmoji(summary.createSpan({ cls: 'apm-role-icon' }), role.icon);
 	summary.createSpan({ text: role.name || 'Untitled role' });
 	if (role.hidden) summary.createSpan({ cls: 'apm-hidden-tag', text: 'hidden' });
 	summary.append(moveButtons(roles, role, ctx));
@@ -39,7 +40,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 		}));
 	new Setting(details)
 		.setName('Icon')
-		.setDesc('Lucide icon name, e.g. book-heart.')
+		.setDesc('Lucide icon name or an emoji, e.g. book-heart or 📚.')
 		.addText((t) => t.setValue(role.icon).onChange((v) => {
 			role.icon = v.trim();
 			ctx.save();
@@ -51,7 +52,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 			role.color = v;
 			ctx.saveAndRedraw();
 		}));
-
+	// Show/hide in toolbar.
 	new Setting(details)
 		.setName('Show in toolbar')
 		.setDesc('Turn off for an old role: it leaves the toolbar, but its badges stay so past tasks still render.')
@@ -70,7 +71,7 @@ export function renderRole(el: HTMLElement, roles: Role[], role: Role, ctx: Sect
 
 	// Role-wide task types and statuses.
 	details.createEl('h5', { text: 'Task types' });
-	details.createDiv({ cls: 'apm-hint', text: 'Shown as pastel chips; the colour sets the hue.' });
+	details.createDiv({ cls: 'apm-hint', text: 'Shown as rounded chips in the picked colour.' });
 	renderOptionList(details, 'type', role.types, role.color, ctx);
 	details.createEl('h5', { text: 'Task statuses' });
 	details.createDiv({ cls: 'apm-hint', text: 'Shown as solid badges. Click a status or type badge in a task to change it.' });

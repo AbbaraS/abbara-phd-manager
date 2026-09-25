@@ -124,30 +124,32 @@
 /*
 	Custom Badges puts the badge key in data-inline-badge and the colour in --badge-color ("r, g, b").
 	Our keys contain "-t-" for types and "-s-" for statuses, e.g. "phd-t-code", "phd-s-done".
+	Text colour, background and radius set in Custom Badges (--badge-text-color, --badge-bg-color,
+	--badge-radius) win over the looks below.
 */
 
-/* Types: soft pastel pills. Light theme = pastel fill with normal text. */
+/* Types: rounded pills. Light theme = colour fill with normal text. */
 .inline-badge[data-inline-badge*="-t-"] {
-	border-radius: 999px;
+	border-radius: var(--badge-radius, 999px);
 	padding-inline: 2px 4px;
-	background-color: rgba(var(--badge-color), 1);
-	color: var(--text-normal);
+	background-color: var(--badge-bg-color, rgba(var(--badge-color), 1));
+	color: var(--badge-text-color, var(--text-normal));
 	font-weight: var(--font-medium);
 }
 
-/* Dark theme = pastel text on a faint pastel tint. */
+/* Dark theme = coloured text on a faint tint. */
 .theme-dark .inline-badge[data-inline-badge*="-t-"] {
-	background-color: rgba(var(--badge-color), 0.18);
-	color: rgb(var(--badge-color));
+	background-color: var(--badge-bg-color, rgba(var(--badge-color), 0.18));
+	color: var(--badge-text-color, rgb(var(--badge-color)));
 }
 
 /* Statuses: solid, bold, uppercase so they stand out from everything else. */
 .inline-badge[data-inline-badge*="-s-"] {
 	padding-inline: 2px 6px;
-	border-radius: var(--radius-s);
-	background-color: rgb(var(--badge-color));
+	border-radius: var(--badge-radius, var(--radius-s));
+	background-color: var(--badge-bg-color, rgb(var(--badge-color)));
 	box-shadow: var(--shadow-s);
-	color: var(--text-on-accent);
+	color: var(--badge-text-color, var(--text-on-accent));
 	font-weight: var(--font-bold);
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
@@ -348,4 +350,18 @@
 .apm-move button:disabled {
 	opacity: 0.3;
 	cursor: default;
+}
+
+/* Emoji used as an icon (toolbar, settings, menus, progress cards), sized like the Lucide icons. */
+.apm-emoji {
+	font-size: 14px;
+	line-height: 1;
+}
+.apm-card-icon.apm-emoji {
+	font-size: 16px;
+}
+.menu-item-icon.apm-emoji {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }

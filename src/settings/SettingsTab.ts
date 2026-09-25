@@ -36,14 +36,14 @@ export class SettingsTab extends PluginSettingTab {
 
 		// General options.
 		new Setting(containerEl)
-			.setName('Daily notes only')
+			.setName('Toolbar only visible in daily notes')
 			.setDesc('Show the role toolbar only on daily notes.')
 			.addToggle((t) => t.setValue(settings.dailyNotesOnly).onChange((v) => {
 				settings.dailyNotesOnly = v;
 				ctx.save();
 			}));
 		new Setting(containerEl)
-			.setName('Keep badges on Enter')
+			.setName('Keep task badges on Enter')
 			.setDesc('Pressing Enter at the end of a task starts the next task with the same role, project and type.')
 			.addToggle((t) => t.setValue(settings.carryOnEnter).onChange((v) => {
 				settings.carryOnEnter = v;

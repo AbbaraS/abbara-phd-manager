@@ -20,7 +20,7 @@ export function renderOptionList(el: HTMLElement, kind: OptionKind, list: TaskOp
 				option.name = v;
 				ctx.save();
 			}))
-			.addText((t) => t.setPlaceholder('Icon').setValue(option.icon).onChange((v) => {
+			.addText((t) => t.setPlaceholder('Icon or emoji').setValue(option.icon).onChange((v) => {
 				option.icon = v.trim();
 				ctx.save();
 			}))
