@@ -850,3 +850,177 @@ details[open] > .apm-section-summary {
 		display: none;
 	}
 }
+
+/* ---------- Dashboard tab ---------- */
+
+.apm-view {
+	padding: var(--size-4-4) var(--size-4-6);
+	max-width: 1600px;
+	margin: 0 auto;
+	container: apm-view / inline-size;
+}
+.apm-view-title { display: flex; align-items: center; gap: var(--size-4-2); margin: 0; font-size: var(--h2-size); }
+.apm-view-title-icon { display: inline-flex; color: var(--interactive-accent); }
+.apm-muted { color: var(--text-muted); font-size: var(--font-ui-smaller); }
+
+/* Sections: full-width ones one under another; runs of half-width ones in two columns. Narrow: one column. */
+.apm-bands { display: flex; flex-direction: column; gap: var(--size-4-4); margin-top: var(--size-4-4); }
+.apm-band { display: flex; align-items: stretch; gap: var(--size-4-4); }
+.apm-band-col { flex: 1 1 0; min-width: 0; min-height: 60px; display: flex; flex-direction: column; gap: var(--size-4-4); border-radius: var(--radius-l); }
+.apm-band-col.is-drop { outline: 2px dashed var(--interactive-accent); outline-offset: 2px; }
+@container apm-view (max-width: 900px) { .apm-band, .apm-band-col { display: contents; } .apm-width { display: none; } }
+
+/* A section on a card, with a title bar: click to collapse, drag the grip to move. */
+.apm-box {
+	min-width: 0;
+	padding: var(--size-4-3) var(--size-4-4) var(--size-4-4);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-l);
+	background: var(--background-secondary);
+}
+.apm-box-title {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 var(--size-4-2);
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+	user-select: none;
+	border-radius: var(--radius-s);
+}
+.apm-box-title:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
+.apm-box-icon { display: inline-flex; color: var(--interactive-accent); }
+.apm-box-icon svg, .apm-chev svg { width: 15px; height: 15px; }
+.apm-box.is-collapsed { padding-bottom: var(--size-4-3); }
+.apm-box.is-collapsed > .apm-box-title { margin-bottom: 0; }
+.apm-box-title .apm-chev { margin-left: auto; transition: transform 120ms ease; }
+.apm-box:not(.is-collapsed) > .apm-box-title .apm-chev { transform: rotate(90deg); }
+.apm-width { display: inline-flex; margin-left: auto; padding: 2px; color: var(--text-faint); opacity: 0; }
+.apm-width + .apm-chev { margin-left: 0; }
+.apm-width svg { width: 14px; height: 14px; }
+.apm-box-title:hover .apm-width, .apm-width:focus-visible { opacity: 1; }
+.apm-grip { display: inline-flex; margin-left: -10px; color: var(--text-faint); cursor: grab; opacity: 0; transition: opacity 120ms ease; }
+.apm-grip svg { width: 14px; height: 14px; }
+.apm-box-title:hover .apm-grip, .apm-box-title:focus-visible .apm-grip { opacity: 1; }
+@media (hover: none) { .apm-grip, .apm-width { opacity: 1; } }
+.apm-box.is-dragging { opacity: 0.4; }
+.apm-box.is-drop-before { box-shadow: 0 -3px 0 0 var(--interactive-accent); }
+.apm-box.is-drop-after { box-shadow: 0 3px 0 0 var(--interactive-accent); }
+
+/* Fallback badge (Custom Badges not installed): a chip tinted with the badge colour. */
+.apm-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 0 6px;
+	border-radius: var(--radius-s);
+	background: color-mix(in srgb, var(--apm-chip-color) 22%, transparent);
+	font-size: var(--font-ui-smaller);
+	white-space: nowrap;
+}
+.apm-chip.is-type { border-radius: 999px; }
+.apm-chip.is-status { background: var(--apm-chip-color); color: var(--text-on-accent); font-weight: var(--font-bold); text-transform: uppercase; }
+.apm-chip-icon { display: inline-flex; color: var(--apm-chip-color); }
+.apm-chip-icon svg { width: 12px; height: 12px; }
+.apm-chip.is-status .apm-chip-icon { color: inherit; }
+
+/* Add-task form. */
+.apm-newtask { display: flex; flex-direction: column; gap: var(--size-4-2); margin-bottom: var(--size-4-3); padding-bottom: var(--size-4-3); border-bottom: 1px solid var(--background-modifier-border); }
+.apm-newtask-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--size-4-2); }
+.apm-field { display: flex; flex-direction: column; gap: 2px; }
+.apm-field label { color: var(--text-muted); font-size: var(--font-ui-smaller); }
+.apm-newtask-text { flex: 1 1 260px; }
+
+/* Role filter chips and the completed-tasks eye. */
+.apm-taskbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--size-4-2); margin-bottom: var(--size-4-2); }
+.apm-taskbar .apm-tool-button { margin-left: auto; }
+.apm-rolechip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	padding: 1px var(--size-4-2);
+	border: 1px solid var(--apm-role-color);
+	border-radius: var(--radius-m);
+	background: color-mix(in srgb, var(--apm-role-color) 12%, transparent);
+	font-size: var(--font-ui-small);
+	box-shadow: none;
+	cursor: pointer;
+}
+.apm-rolechip.is-active { background: color-mix(in srgb, var(--apm-role-color) 35%, transparent); }
+.apm-rolechip.is-dimmed { opacity: 0.45; }
+
+/* The task table: role rows, project rows, then tasks. */
+.apm-tasks { width: 100%; border-collapse: collapse; font-size: var(--font-ui-small); }
+.apm-tasks th {
+	padding: 2px var(--size-4-2);
+	border-bottom: 1px solid var(--background-modifier-border);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-semibold);
+	text-align: left;
+	white-space: nowrap;
+}
+.apm-tasks td { padding: 3px var(--size-4-2); vertical-align: top; border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 50%, transparent); }
+.apm-role-row td { padding-top: var(--size-4-3); border-bottom: 2px solid var(--apm-role-color); }
+.apm-project-row td { padding-left: var(--size-4-4); background: color-mix(in srgb, var(--apm-role-color) 6%, transparent); }
+.apm-role-row, .apm-project-row { cursor: pointer; }
+.apm-role-row .apm-chev, .apm-project-row .apm-chev { display: inline-flex; vertical-align: middle; margin-right: var(--size-4-1); color: var(--text-faint); }
+.apm-group-count { margin-left: var(--size-4-2); }
+.apm-task-check { width: 1%; padding-left: var(--size-4-6); }
+.apm-task-main { width: 100%; }
+.apm-task-main > * { margin-right: var(--size-4-1); vertical-align: middle; }
+.apm-task-prio, .apm-task-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.apm-task-date { color: var(--text-muted); }
+.apm-task-date.is-overdue { color: var(--text-error); font-weight: var(--font-semibold); }
+.apm-task.is-done .apm-task-title, .apm-task.is-cancelled .apm-task-title { color: var(--text-faint); text-decoration: line-through; }
+.apm-task.is-done .inline-badge, .apm-task.is-cancelled .inline-badge, .apm-task.is-done .apm-chip, .apm-task.is-cancelled .apm-chip { opacity: 0.5; }
+.apm-scheduled { padding: 0 6px; border-radius: 999px; background: var(--background-modifier-hover); color: var(--text-muted); font-size: var(--font-ui-smaller); }
+@container apm-view (max-width: 700px) { .apm-tasks th:nth-child(n+3), .apm-tasks td:nth-child(n+3) { display: none; } .apm-task-check { padding-left: var(--size-4-2); } }
+
+/* Time sections. */
+.apm-actions { display: flex; flex-wrap: wrap; gap: var(--size-4-2); margin-bottom: var(--size-4-3); }
+.apm-total { font-weight: var(--font-semibold); }
+.apm-semester { display: grid; grid-template-columns: auto 1fr; gap: 0 var(--size-4-3); align-items: center; margin-bottom: var(--size-4-2); font-variant-numeric: tabular-nums; }
+.apm-semester-name { font-weight: var(--font-semibold); }
+.apm-semester .apm-bar { grid-column: 1 / -1; }
+.apm-semester.is-full { color: var(--text-error); }
+.apm-bar { height: 6px; border-radius: 3px; background: var(--background-modifier-border); overflow: hidden; }
+.apm-bar-fill { height: 100%; background: var(--interactive-accent); }
+.apm-semester.is-full .apm-bar-fill { background: var(--text-error); }
+
+/* A period card: tinted with the role colour, collapsible. */
+.apm-period {
+	margin-top: var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3);
+	border: 1px solid color-mix(in srgb, var(--apm-role-color) 30%, var(--background-modifier-border));
+	border-left: 4px solid var(--apm-role-color);
+	border-radius: var(--radius-m);
+	background: color-mix(in srgb, var(--apm-role-color) 6%, var(--background-primary));
+}
+.apm-period.is-submitted { opacity: 0.75; }
+.apm-period-head { display: flex; align-items: center; gap: var(--size-4-2); cursor: pointer; }
+.apm-period-head .apm-chev { display: inline-flex; color: var(--text-faint); }
+.apm-period-title { display: flex; flex: 1; flex-wrap: wrap; align-items: baseline; gap: var(--size-4-2); }
+.apm-period-name { font-weight: var(--font-bold); }
+.apm-period-window { color: var(--text-muted); font-size: var(--font-ui-smaller); }
+.apm-pill { padding: 0 8px; border-radius: 999px; font-size: var(--font-ui-smaller); font-weight: var(--font-semibold); background: var(--background-modifier-hover); }
+.apm-pill.is-open { background: var(--interactive-accent); color: var(--text-on-accent); }
+.apm-pill.is-after { background: var(--text-error); color: var(--text-on-accent); }
+.apm-pill.is-done { background: var(--text-success, var(--interactive-accent)); color: var(--text-on-accent); }
+.apm-period-sums { display: flex; flex-wrap: wrap; align-items: center; gap: var(--size-4-1) var(--size-4-3); margin-top: var(--size-4-1); font-variant-numeric: tabular-nums; }
+.apm-sum { display: inline-flex; align-items: center; gap: var(--size-4-1); }
+.apm-course { margin-top: var(--size-4-3); }
+.apm-course-head, .apm-type-head { display: flex; align-items: center; gap: var(--size-4-2); margin-top: var(--size-4-2); font-weight: var(--font-semibold); }
+.apm-type-head { margin-left: var(--size-4-3); font-weight: var(--font-normal); }
+.apm-entries { margin: 2px 0 0 var(--size-4-3); border-collapse: collapse; font-size: var(--font-ui-small); font-variant-numeric: tabular-nums; }
+.apm-entries td { padding: 1px var(--size-4-3) 1px 0; vertical-align: top; }
+.apm-entries button { height: auto; padding: 2px; }
+.apm-entry-date { white-space: nowrap; color: var(--text-muted); }
+.apm-entry-len { font-weight: var(--font-semibold); white-space: nowrap; }
+.apm-last { margin-bottom: var(--size-4-2); }
+.apm-last.is-late strong { color: var(--text-error); }
+.apm-history { margin-top: var(--size-4-3); color: var(--text-muted); }
+.apm-textbox { width: 100%; font-family: var(--font-monospace); font-size: var(--font-ui-small); }

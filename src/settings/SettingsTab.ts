@@ -6,6 +6,8 @@ import { renderRolesFileInfo } from './sections/rolesFileInfo';
 import { slugify, uniqueId } from '../utils/ids';
 import { BadgeLook, renderBadge } from '../integrations/customBadges';
 import { DoneBadgeLook } from '../models/types';
+import { renderDashboardSections } from './sections/dashboardSection';
+import { renderTimeTracking } from './sections/timeSection';
 
 // Shared helpers passed to every settings section.
 export interface SectionContext {
@@ -26,6 +28,9 @@ export class SettingsTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl, plugin } = this;
 		const settings = plugin.settings;
+		// Rebuilding empties the page, which would jump it to the top; put it back where it was.
+		const scroller = containerEl.closest<HTMLElement>('.vertical-tab-content') ?? containerEl;
+		const scroll = scroller.scrollTop;
 		containerEl.empty();
 
 		const ctx: SectionContext = {
@@ -95,6 +100,10 @@ export class SettingsTab extends PluginSettingTab {
 				new Notice('Badges synced');
 			}));
 
+		// Dashboard and time tracking.
+		renderDashboardSections(containerEl, settings, ctx);
+		renderTimeTracking(containerEl, settings, ctx);
+
 		// Roles.
 		new Setting(containerEl).setName('Roles').setHeading();
 		renderRolesFileInfo(containerEl, plugin.rolesFile);
@@ -112,6 +121,9 @@ export class SettingsTab extends PluginSettingTab {
 				plugin.rolesFile.error = ''; // an explicit reset may overwrite a broken file
 				ctx.saveAndRedraw();
 			}));
+
+		scroller.scrollTop = scroll;
+		window.requestAnimationFrame(() => (scroller.scrollTop = scroll));
 	}
 
 	// Redraw if the page is showing (e.g. after the roles file was edited).

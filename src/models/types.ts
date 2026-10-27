@@ -1,3 +1,6 @@
+import type { Period, Semester, TimeEntry, TimeRole } from './time';
+import type { ScheduledTask, TaskMeta } from './taskRows';
+
 // An optional pick on a task: a type ("Bug", "Reading") or a status ("In progress", "Done").
 export interface TaskOption {
 	id: string;    // short key used in badge names
@@ -52,4 +55,23 @@ export interface ManagerSettings {
 	doneBadgeLook: DoneBadgeLook; // badges on ticked tasks: grey, struck through, both or unchanged
 	syncBadges: boolean;         // push role/project/type/status badges into Custom Badges
 	managedBadgeKeys: string[];  // badge keys this plugin created, so it can tidy them up
+
+	// Dashboard layout (ids of the dashboard sections).
+	dashOrder: string[];
+	dashHidden: string[];
+	dashCollapsed: string[];
+	dashHalf: string[];
+	dashColumns: Record<string, 'left' | 'right'>;
+	dashCollapsedGroups: string[]; // task table groups folded shut: role ids and "role/project" keys
+	dashHideDone: boolean;         // task table hides completed tasks
+	dashClosedPeriods: string[];   // period ids whose cards are collapsed or expanded by hand (see dashOpenPeriods)
+	dashOpenPeriods: string[];
+
+	// Task and time tracking.
+	taskMeta: Record<string, TaskMeta>; // created / completed times, by task id
+	scheduledTasks: ScheduledTask[];    // future tasks waiting for their daily note
+	timeRoles: TimeRole[];
+	semesters: Semester[];
+	periods: Period[];
+	timeEntries: TimeEntry[];
 }

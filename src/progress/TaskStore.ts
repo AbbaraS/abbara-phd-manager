@@ -2,12 +2,14 @@ import { Events, Plugin, TAbstractFile, TFile, debounce, moment } from 'obsidian
 import { BadgeEntry } from '../models/badgeIndex';
 import { TaskRecord, scanTasks } from './scanTasks';
 import { NoteTasks, Progress, countProgress } from './countProgress';
+import type { NoteEntry } from '../models/taskRows';
 import { firstSeenDates } from '../sort/firstSeen';
 import { dailyNoteDate } from '../utils/dailyNotes';
 
 // Keeps every badge task in the vault indexed, and fires "updated" when anything changes.
 export class TaskStore extends Events {
 	private notes = new Map<string, NoteTasks>(); // path -> tasks in that note
+	ready = false; // true once every note has been read
 
 	constructor(private plugin: Plugin) {
 		super();
@@ -43,6 +45,19 @@ export class TaskStore extends Events {
 		return this.notes.get(path)?.tasks ?? [];
 	}
 
+	// True if some copy of the task with this id is ticked or cancelled.
+	isClosed(id: string): boolean {
+		for (const note of this.notes.values()) {
+			if (note.tasks.some((t) => t.id === id && 'xX-'.includes(t.mark))) return true;
+		}
+		return false;
+	}
+
+	// Every indexed note with its path.
+	entries(): NoteEntry[] {
+		return [...this.notes].map(([path, note]) => ({ path, note }));
+	}
+
 	// Day each task was first written down, by copy key (see sort/firstSeen.ts).
 	firstSeen(): Map<string, string> {
 		return firstSeenDates(this.notes.values());
@@ -57,6 +72,7 @@ export class TaskStore extends Events {
 			if (cache && !cache.listItems?.some((item) => item.task !== undefined)) continue;
 			this.setNote(file, await vault.cachedRead(file));
 		}
+		this.ready = true;
 		this.changed();
 	}
 

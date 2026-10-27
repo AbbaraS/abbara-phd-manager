@@ -17,6 +17,9 @@ import { TaskFilter } from './filter/TaskFilter';
 import { TODAY_BLOCK, TodayBlock } from './today/TodayBlock';
 import { PinnedToday } from './today/PinnedToday';
 import { DoneBadgeLookManager } from './display/doneBadgeLook';
+import { TaskLog } from './progress/TaskLog';
+import { DailyTasks } from './tasks/DailyTasks';
+import { DASHBOARD_VIEW, DashboardView } from './dashboard/DashboardView';
 
 // Plugin entry point: wires settings, toolbar and badge sync together.
 export default class ProjectManagerPlugin extends Plugin {
@@ -24,6 +27,8 @@ export default class ProjectManagerPlugin extends Plugin {
 	tasks = new TaskStore(this);
 	filter = new TaskFilter(this);
 	pinnedToday = new PinnedToday(this);
+	taskLog = new TaskLog(this);
+	dailyTasks = new DailyTasks(this);
 	rolesFile = new RolesFile(this, (roles) => void this.onRolesFileEdited(roles));
 	private toolbar = new ToolbarManager(this);
 	sorter = new TaskSorter(this);
@@ -32,6 +37,9 @@ export default class ProjectManagerPlugin extends Plugin {
 
 	// Save shortly after the user stops typing.
 	requestSave = debounce(() => this.saveSettings(), 600, true);
+
+	// Same for settings that need no badge sync (task log, time entries, dashboard layout).
+	requestSaveOptions = debounce(() => void this.commit(), 800, true);
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -62,6 +70,15 @@ export default class ProjectManagerPlugin extends Plugin {
 		// Task order: command + auto-sort of new daily notes.
 		this.sorter.register();
 
+		// Created / completed times, future tasks and time-tracking reminders.
+		this.taskLog.register();
+		this.dailyTasks.register();
+
+		// Dashboard: tasks by role and project, hours, project summary.
+		this.registerView(DASHBOARD_VIEW, (leaf) => new DashboardView(leaf, this));
+		this.addRibbonIcon('layout-dashboard', 'Open PhD Manager dashboard', () => void this.openDashboard());
+		this.addCommand({ id: 'open-dashboard', name: 'Open dashboard', callback: () => void this.openDashboard() });
+
 		// Custom Badges may load after us, so sync once everything is ready.
 		this.app.workspace.onLayoutReady(() => this.pushBadges(false));
 
@@ -79,6 +96,27 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.settingsTab.refreshIfOpen();
 	}
 
+	// Shows the dashboard, reusing an open one.
+	async openDashboard(): Promise<void> {
+		const { workspace } = this.app;
+		const leaf = workspace.getLeavesOfType(DASHBOARD_VIEW)[0] ?? workspace.getLeaf('tab');
+		await leaf.setViewState({ type: DASHBOARD_VIEW, active: true });
+		await workspace.revealLeaf(leaf);
+	}
+
+	// Redraws every open dashboard.
+	refreshDashboards(): void {
+		for (const leaf of this.app.workspace.getLeavesOfType(DASHBOARD_VIEW)) {
+			if (leaf.view instanceof DashboardView) leaf.view.render();
+		}
+	}
+
+	// Saves data.json and redraws the dashboards.
+	async commit(): Promise<void> {
+		await this.saveOptions();
+		this.refreshDashboards();
+	}
+
 	onunload(): void {
 		this.toolbar.removeAll();
 		this.pinnedToday.removeAll();
@@ -89,7 +127,7 @@ export default class ProjectManagerPlugin extends Plugin {
 	async loadSettings(): Promise<void> {
 		const saved = ((await this.loadData()) ?? {}) as Partial<ManagerSettings>;
 		const oldRoles = saved.roles; // older versions kept roles in data.json
-		this.settings = { ...DEFAULT_SETTINGS, ...saved, roles: [] };
+		this.settings = { ...structuredClone(DEFAULT_SETTINGS), ...saved, roles: [] };
 
 		const fromFile = await this.rolesFile.load();
 		this.settings.roles = fromFile ?? oldRoles ?? cloneRoles();
@@ -110,6 +148,7 @@ export default class ProjectManagerPlugin extends Plugin {
 		this.filter.rolesChanged();
 		this.pinnedToday.refresh();
 		this.doneLook.apply();
+		this.refreshDashboards();
 	}
 
 	// Save everything except roles to data.json.

@@ -36,3 +36,11 @@ export const isDailyNote = (app: App, file: TFile | null) => dailyNoteDate(app, 
 // Notes the plugin's toolbar, filter and dividers work on: daily notes, or every note if `dailyOnly` is off.
 export const isManagedNote = (app: App, file: TFile | null, dailyOnly: boolean) =>
 	!!file && (!dailyOnly || isDailyNote(app, file));
+
+// The daily note for `date` ("YYYY-MM-DD") if it exists.
+export function dailyNoteFile(app: App, date: string): TFile | null {
+	const { folder = '', format = 'YYYY-MM-DD' } = dailyNoteOptions(app);
+	const path = normalizePath(`${folder}/${moment(date, 'YYYY-MM-DD').format(format)}.md`);
+	const file = app.vault.getAbstractFileByPath(path);
+	return file instanceof TFile ? file : null;
+}

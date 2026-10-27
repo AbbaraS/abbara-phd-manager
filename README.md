@@ -185,3 +185,11 @@ Test vault: `myPluginTestVault/.obsidian/plugins/abbara-phd-manager` is a symlin
 - Role filter in reading view
 - Due dates, priorities, status
 - Confirm before "Reset to defaults"
+
+## Dashboard
+
+Open it from the ribbon icon (or the "Open dashboard" command). Sections can be dragged by their grip, made half width, collapsed or hidden (also in settings).
+
+- **Tasks**: every task in a table grouped by role and project, with priority, due, created on and completed on. Created and completed times are logged in `data.json` (never written into the notes). Use the form on top to add tasks; pick a later day and the task only appears in that day's daily note, then rolls over until done.
+- **Time tracking** (settings → Time tracking): roles with *Periods* (GTA: hours per course, submitted in windows, semester hour limits) or a *Timesheet* (ResLife: submit every ~10 days, "Timesheet text" button). Reminder tasks are added to the daily note automatically.
+- **Project summary**: the deadline cards from the `apm-progress` block.
