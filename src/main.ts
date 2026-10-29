@@ -101,7 +101,7 @@ export default class ProjectManagerPlugin extends Plugin {
 		const { workspace } = this.app;
 		const leaf = workspace.getLeavesOfType(DASHBOARD_VIEW)[0] ?? workspace.getLeaf('tab');
 		await leaf.setViewState({ type: DASHBOARD_VIEW, active: true });
-		await workspace.revealLeaf(leaf);
+		workspace.setActiveLeaf(leaf, { focus: true }); // revealLeaf() needs Obsidian 1.7.2
 	}
 
 	// Redraws every open dashboard.

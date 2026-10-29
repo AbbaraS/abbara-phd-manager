@@ -1,4 +1,4 @@
-import type { TFile } from 'obsidian';
+import { TFile } from 'obsidian';
 import type ProjectManagerPlugin from '../main';
 import { buildBadgeIndex } from '../models/badgeIndex';
 import type { TaskRow } from '../models/taskRows';
@@ -54,8 +54,8 @@ function firstOfRole(lines: string[], isRole: (line: string) => boolean, isOurs:
 // Ticks or unticks the newest copy of a dashboard task (found by its id, else by its line).
 export async function setTaskMark(plugin: ProjectManagerPlugin, row: TaskRow, mark: ' ' | 'x'): Promise<void> {
 	const file = plugin.app.vault.getAbstractFileByPath(row.path);
-	if (!file || !('extension' in file)) return;
-	await plugin.app.vault.process(file as TFile, (text) => {
+	if (!(file instanceof TFile)) return;
+	await plugin.app.vault.process(file, (text) => {
 		const lines = text.split('\n');
 		const at = row.id ? lines.findIndex((l) => isTaskLine(l) && taskIdOf(l) === row.id) : row.line;
 		if (at < 0 || !lines[at] || !isTaskLine(lines[at])) return text;
